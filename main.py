@@ -35,11 +35,17 @@ if __name__ == "__main__":
                     choice = input("Enter your choice: ")
                     if choice == "1":
                         try:
-                            account_type = input("Enter account type (Checking, Savings, Credit, Business, Investment): ")
-                            print(f"Minimum balance: {user.get_minimum_balance(account_type)}")
-                            balance = float(input("Enter initial balance: "))
+                            account_type = input("Enter account type (Checking, Savings, Credit, Business): ")
+                            balance = 0
+                            if account_type != "Credit":
+                                print(f"Minimum balance: {user.get_minimum_balance(account_type)}")
+                                balance = float(input("Enter initial balance: "))
                             account_number = user.create_account(pin, account_type, balance)
                             print(f"{account_type} account created successfully! Account Number: {account_number}")
+                            print(f"Current balance: {user.get_account(pin, account_type, account_number).get_balance()}")
+                            if account_type == "Credit":
+                                print(f"Available credit limit: {user.get_account(pin, account_type, account_number).get_credit_limit()}")
+                                print(f"Available points: {user.get_account(pin, account_type, account_number).get_points()}")
                         except ValueError as e:
                             print(e)
                     elif choice == "2":
@@ -49,14 +55,21 @@ if __name__ == "__main__":
                             print(e)
                     elif choice == "3":
                         try:
-                            account_type = input("Enter account type (Checking, Savings, Credit, Business, Investment): ")
+                            account_type = input("Enter account type (Checking, Savings, Credit, Business): ")
                             user.can_make_purchase(pin, account_type)
-                            print(f"Available accounts of type {account_type}: {', '.join([f'Account Number: {account.get_account_number()}, Balance: {account.get_balance()}' for account in user.get_accounts(pin, account_type).values()])}")
+                            for account in user.get_accounts(pin, account_type).values():
+                                print(f"Account Number: {account.get_account_number()}, Balance: {account.get_balance()}")
+                                if account_type == "Credit":
+                                    print(f"Available credit limit: {account.get_credit_limit()}")
+                                    print(f"Available points: {account.get_points()}")
                             account_number = int(input("Enter account number: "))
                             amount = float(input("Enter purchase amount: "))
                             user.make_purchase(pin, account_type, account_number, amount)
                             print(f"Purchase of {amount} made successfully from {account_type} account {account_number}.")
                             print(f"New balance: {user.get_account(pin, account_type, account_number).get_balance()}")
+                            if account_type == "Credit":
+                                print(f"Available credit limit: {user.get_account(pin, account_type, account_number).get_credit_limit()}")
+                                print(f"Available points: {user.get_account(pin, account_type, account_number).get_points()}")
                         except ValueError as e:
                             print(e)
                     elif choice == "4":

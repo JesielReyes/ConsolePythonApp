@@ -20,7 +20,7 @@ class User:
         elif account_type == "Investment":
             account = InvestmentAccount(balance)
         elif account_type == "Credit":
-            account = CreditAccount(balance)
+            account = CreditAccount()
         else:
             raise ValueError("Invalid account type")
         if account.get_account_number() in self._accounts[account_type]:
