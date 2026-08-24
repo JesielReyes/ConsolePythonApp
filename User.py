@@ -25,7 +25,7 @@ class User:
             raise ValueError("Invalid account type")
         if account.get_account_number() in self._accounts[account_type]:
             raise ValueError("Account number already exists")
-        self._accounts[account_type][account.get_account_number] = account
+        self._accounts[account_type][account.get_account_number()] = account
         return account.get_account_number()
 
     def check_pin(self, pin):

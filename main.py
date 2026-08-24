@@ -65,8 +65,12 @@ if __name__ == "__main__":
                         if len(new_pin) != 4 or not new_pin.isdigit():
                             print("Invalid new PIN. Please enter a 4-digit PIN.")
                             continue
+                        if new_pin in users:
+                            print("A user with the new PIN already exists. Please choose a different PIN.")
+                            continue
                         try:
                             user.change_pin(old_pin, new_pin)
+                            users[new_pin] = users.pop(old_pin) 
                         except ValueError as e:
                             print(e)
                     elif choice == "5":
