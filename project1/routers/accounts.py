@@ -57,15 +57,7 @@ def create_account(account_request: AccountCreate):
     ACCOUNTS.append(account)
     return account
 
-
-@router.patch("/{account_id}")
-def update_account(account_id: int, account_request: AccountUpdate):
-    account = _find_account(account_id)
-    if account_request.account_type is not None:
-        account["account_type"] = account_request.account_type
-    return account
-
-
+#admin specific
 @router.delete("/{account_id}")
 def delete_account(account_id: int):
     account = _find_account(account_id)

@@ -32,7 +32,7 @@ def list_users():
 def read_user(user_id: int):
     return _find_user(user_id)
 
-
+#
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_user(user_request: UserCreate):
     user = {
@@ -53,7 +53,7 @@ def update_user(user_id: int, user_request: UserUpdate):
         user["is_admin"] = user_request.is_admin
     return user
 
-
+#admin specifc
 @router.delete("/{user_id}")
 def delete_user(user_id: int):
     user = _find_user(user_id)
