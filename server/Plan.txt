@@ -1,79 +1,115 @@
-ToDo's
-1. accounts
-2, User stuff
-3. Transactions
+# ConsolePythonApp Plan
+
+## Product Goal
+
+Build a banking application with account, user, transaction, and payment-category tracking. The category tracker should let a user assign each purchase to a fixed category.
+
+The category tracker is the primary differentiator, alongside the coin-flip feature.
+
+## Requirements
+
+### Category Tracking MVP
+
+- A payment must support an optional category.
+- A user can assign each purchase to one category from a fixed set.
+
+### Category Tracking Stretch Goal: ML Prediction
+
+- Treat ML categorization as a later experiment, not an MVP dependency.
+- Define a prediction interface that can later suggest a category for the user to confirm.
+- A prediction must include a category, confidence score, and model/version metadata.
+
+### Backend
+
+- `server/` contains the FastAPI application.
+- Implement an in-memory POC while management decides between PostgreSQL and MongoDB; persistence is intentionally temporary.
+- Organize the MVP backend around API routes/controllers, services, repositories, and Pydantic DTOs. ORM models and database sessions are deferred.
+- Expose CRUD endpoints for users, accounts, transactions/payments, and fixed categories.
+- Add a simple unsecured endpoint, `POST /accounts/{account_id}/purchases`, that posts a purchase to a user's account.
+- The purchase request should include amount, description or merchant, and an optional category; posting it should create the purchase and corresponding account debit/ledger entry.
+- Use FastAPI's OpenAPI output as the API contract and keep request/response schemas explicit.
+- Document the API through the generated Swagger UI and OpenAPI schema.
+
+### API Surface
+
+#### Current Scaffold
+
+- `GET /` returns a basic health response.
+- `GET /items/{item_id}` is the default FastAPI example route and should be removed once the POC routes are added.
+
+#### POC Endpoints
+
+- `GET /health` confirms that the API is running.
+- `GET /categories` returns the fixed categories available for purchase assignment.
+- `GET /accounts/{account_id}` returns an account summary and current balance.
+- `GET /accounts/{account_id}/ledger` returns the account's immutable ledger entries.
+- `POST /accounts/{account_id}/purchases` posts a purchase to the account. The request includes amount, merchant or description, and an optional fixed category. The response includes the created purchase and its initial ledger entry.
+- `GET /accounts/{account_id}/purchases` lists purchases posted to the account.
+- `GET /purchases/{purchase_id}` returns one purchase and its category.
+- `PATCH /purchases/{purchase_id}/category` changes the category selected for a purchase.
+- `POST /purchases/{purchase_id}/wager` creates a double-or-nothing wager for an eligible previous purchase.
+- `POST /wagers/{wager_id}/resolve` resolves the wager with a 50-50 refund or second charge.
+- `GET /wagers/{wager_id}` returns wager status and outcome.
+
+Wager endpoints must enforce the weekly wager limit, ensure the purchase belongs to the account owner, and prevent a wager from being resolved more than once. A successful refund or second charge creates a separate ledger entry.
+
+All endpoint request and response types should be defined in `app/schemas.py` so FastAPI can expose them through OpenAPI for future TypeScript generation. As a nice-to-have, the MVP repository may use simple in-memory records instead of ORM models.
+
+### Server File Structure
+
+The planned backend package is `server/app/`:
+
+```text
+server/
+├── Plan.txt
+└── app/
+	├── __init__.py       # Python package marker
+	├── database.py       # Post-MVP database connection and session configuration
+	├── models.py         # Post-MVP ORM entity types and relationships
+	├── schemas.py        # Pydantic request and response DTOs
+	├── repository.py     # Persistence and query helpers
+	├── service.py        # Purchase, ledger, category, and wager logic
+	└── main.py           # FastAPI app and route/controller definitions
+```
+
+`main.py` should be the application entry point and remain focused on routing and dependency wiring. Business rules belong in `service.py`; database access belongs in `repository.py`; and API shapes belong in `schemas.py`. `database.py` and `models.py` are intentionally not part of the MVP and should be added only after PostgreSQL or MongoDB is selected. The current `server/main.py` is a temporary scaffold while this package structure is introduced.
+
+### Persistence Decision
+
+- Persistence integration is not part of the MVP; the POC may opt to use in-memory storage.
+- Choose either PostgreSQL or MongoDB before implementing database integration.
+- Record the decision and rationale in an ADR, including deployment, transaction consistency, query needs, and team familiarity.
+- Select the matching data-access library/ORM after the database decision; avoid designing around an ORM before then.
+
+### Frontend Contract
+
+- `client/` will contain the React/TypeScript frontend (not part of MVP).
+- Generate TypeScript API types and, where useful, a client from the FastAPI OpenAPI schema.
+- Evaluate hey-api for generation and commit the generation configuration and reproducible command.
+- Treat generated types as build artifacts from the backend contract; do not duplicate request/response models by hand in the frontend.
+
+### Testing Strategy (Deferred POC)
+
+Testing is not part of the current implementation milestone. Later, create a small POC that mocks:
+
+- repository/database interactions;
+- double-or-nothing outcomes and protection against resolving the same wager twice;
 
 
+## Delivery Order
 
-Unique Selling Point: Coin Flip + Category Tracker
+1. Define Pydantic API schemas for users, accounts, purchases, categories, wagers, and ledger entries.
+2. Implement `POST /accounts/{account_id}/purchases` and the purchase posting flow in FastAPI.
+3. Implement the double-or-nothing POC against a previous purchase: a 50-50 result either refunds the purchase amount or charges it a second time, and each purchase can be wagered only once. Wagers are subject a weekly limit (ex. 1/wk).
+4. Add authentication and authorization before exposing user financial data beyond local development.
+5. Add the testing POC, then expand coverage based on the results.
+6. Generate and consume the TypeScript API contract in the React frontend.
 
-Roadmap
+Database sessions in `database.py` and ORM entities in `models.py` are post-MVP work after the persistence decision.
 
-–  Rest API Backend / CRUD/ MVC/ Controller, Services, Repo,
-Design Patterns (Factory, Singleton)
+## Later Roadmap
 
--TDD: Add testing (assertions, service layer, controllers, repo, unit-tests, mockito)
-
--API Testing using Postman
--API Documentation using Swagger
-
-- Databases (Relational: Postgres, Non-Relational or Collection-Bases: MongoDB Cloud Atlas)
-
-Database Integration: ORM
-
--React and React Frontend
-
--Devops: Git, Github, CI-CD , GitHub Actions
-
--Security Considerations: password hashing/salting , BCrypt, Authentication, Authorization, JWT
-
--Cloud Concepts/ AWS/ AWS Deployment
-
--IAC: Terraform
-—---------------------------------------------------------------------------------------------------------------------------------
-
-Bank App Usecase: Single Flow Console App
-
-– Single Flow: You should run it only once, and see the whole flow
-
-- Main/Runner class -> main() -> call everything from within main
-
--Classes: 
-Bank Class
-Abstract User Class 
-Child classes: “Admin”, “Customer” extending from User
-
-Abstract Account Class
-Child Classes: “SavingsAccount”, “CheckingsAccount” extending from Account
-
-“AccountOperations” as an interface: withdraw(), deposit()
-
-SavingsAccount extends Account implements AccountOperations{
-  Withdraw () {
-      // does not allow overdraft
-   } 
-}
-
-CheckingsAccount extends Account implements AccountOperations{
-  Withdraw () {
-      // allow overdraft
-   } 
-}
-
-– Runner -> printMessage( String message) {
-
-}
--> Registered Seed Data for users, some accounts
--> Login ( Scanner, Console.ReadLine…..username/password) -> check against registered data -> deny/allow access
-
--> Check if admin or customer :-> AdminDashboard() / CustomerDashboard()
-
--> AdminDashboard: admin options: ViewAllCustomers, ViewAllAccounts, ………CRUD
-
--> CustomerDashboard:customer options: view his/her own account/accounts, deposit, withdraw, transfer
-
--> Concluding Message
-
-
-Variables, loops, conditionals, ternary, switch-case, OOD( classes, objects, constructors, overloading constructors, attributes with getters/setters ENCAPSULATION, methods, method overloading, inheritance , method overriding
-Strings, collections, Arrays, List, Map/ Dictionary, Sets, TreeSet…………..
+- Password hashing/salting, BCrypt, authentication, authorization, and JWT.
+- Postman/API workflow checks and CI/CD with GitHub Actions.
+- AWS deployment and Terraform infrastructure.
+- Explore ML prediction only after functional requirements have been met.
