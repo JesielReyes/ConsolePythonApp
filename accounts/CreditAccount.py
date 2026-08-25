@@ -1,7 +1,7 @@
-#Points System
 from accounts.Account import Account
 class CreditAccount(Account):
-    def __init__(self, credit_limit, interest=0.35, minimum_payment=0.1):
+    def __init__(self, credit_limit=10000, interest=0.35, minimum_payment=0.1):
+        super().__init__("Credit", 0)
         self.credit_limit = credit_limit
         self._interest_rate = interest
         self.minimum_payment = minimum_payment

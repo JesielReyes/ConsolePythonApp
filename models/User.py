@@ -3,6 +3,7 @@ from accounts.InvestmentAccount import InvestmentAccount
 from accounts.SavingsAccount import SavingsAccount
 from accounts.BusinessAccount import BusinessAccount
 from accounts.CreditAccount import CreditAccount
+
 class User:
     def __init__(self, pin):
         self._accounts = {"Checking": {}, "Savings": {}, "Credit": {}, "Business": {}, "Investment": {}}
@@ -25,7 +26,7 @@ class User:
             raise ValueError("Invalid account type")
         if account.get_account_number() in self._accounts[account_type]:
             raise ValueError("Account number already exists")
-        self._accounts[account_type][account.get_account_number] = account
+        self._accounts[account_type][account.get_account_number()] = account
         return account.get_account_number()
 
     def check_pin(self, pin):
