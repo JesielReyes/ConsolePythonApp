@@ -44,7 +44,7 @@ def read_user(user_id: int):
             detail=str(error)
         )
 
-
+#
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_user(user_request: UserCreate):
     try:
@@ -61,7 +61,7 @@ def create_user(user_request: UserCreate):
             detail=str(error)
         )
 
-
+#admin specifc
 @router.delete("/{user_id}")
 def delete_user(user_id: int):
     try:

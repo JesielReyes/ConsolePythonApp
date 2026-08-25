@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from service import transactions
+from project1.routers import transactions
 from routers import accounts, users
 
 app = FastAPI()
