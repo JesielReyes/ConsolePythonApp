@@ -1,27 +1,28 @@
+<<<<<<<< HEAD:models/User.py
 from accounts.CheckingAccount import CheckingAccount
 from accounts.InvestmentAccount import InvestmentAccount
 from accounts.SavingsAccount import SavingsAccount
 from accounts.BusinessAccount import BusinessAccount
 from accounts.CreditAccount import CreditAccount
+========
+from accounts.checkingAccount import CheckingAccount
+from accounts.savingsAccount import SavingsAccount
+
+>>>>>>>> origin/main:project1/users/user.py
 
 class User:
-    def __init__(self, pin):
+    def __init__(self, pin, owner_id=None):
         self._accounts = {"Checking": {}, "Savings": {}, "Credit": {}, "Business": {}, "Investment": {}}
         self._pin = pin
+        self._owner_id = owner_id
 
     def create_account(self, pin, account_type, balance=0):
         if not self.check_pin(pin):
             raise ValueError("Invalid PIN")
         if account_type == "Checking":
-            account = CheckingAccount(balance)
+            account = CheckingAccount(balance, self._owner_id)
         elif account_type == "Savings":
-            account = SavingsAccount(balance)
-        elif account_type == "Business":
-            account = BusinessAccount(balance)
-        elif account_type == "Investment":
-            account = InvestmentAccount(balance)
-        elif account_type == "Credit":
-            account = CreditAccount(balance)
+            account = SavingsAccount(balance, self._owner_id)
         else:
             raise ValueError("Invalid account type")
         if account.get_account_number() in self._accounts[account_type]:

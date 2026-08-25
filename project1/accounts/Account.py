@@ -1,9 +1,15 @@
 import random
+
+
 class Account:
-    def __init__(self, account_type, balance=0):
+    def __init__(self, account_type, balance=0, owner_id=None):
+        if balance < 0:
+            raise ValueError("Balance cannot be negative")
+        if owner_id is not None and owner_id <= 0:
+            raise ValueError("Owner ID must be positive")
         self._balance = balance
         self._account_type = account_type
-        self._interest_rate = 0.01  # Default interest rate
+        self._owner_id = owner_id
         self._account_number = random.randint(10000000, 99999999)
 
 
@@ -24,3 +30,6 @@ class Account:
     
     def get_account_number(self):
         return self._account_number
+
+    def get_owner_id(self):
+        return self._owner_id
