@@ -33,3 +33,6 @@ class Account:
 
     def get_owner_id(self):
         return self._owner_id
+
+    def get_account_type(self):
+        return self._account_type
