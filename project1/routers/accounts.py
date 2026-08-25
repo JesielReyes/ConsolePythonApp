@@ -3,7 +3,7 @@ from typing import Literal
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlmodel import select
-from database import SessionDep
+from project1.database import SessionDep
 from service import account_service
 
 
