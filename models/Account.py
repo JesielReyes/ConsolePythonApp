@@ -1,26 +1,19 @@
-import random
-class Account:
-    def __init__(self, account_type, balance=0):
+from abc import ABC
+from models.AccountOperations import AccountOperations
+
+
+class Account(AccountOperations, ABC):
+
+    def __init__(self, account_number, customer_id, balance=0):
+        self._account_number = account_number
+        self._customer_id = customer_id
         self._balance = balance
-        self._account_type = account_type
-        self._interest_rate = 0.01  # Default interest rate
-        self._account_number = random.randint(10000000, 99999999)
 
+    def get_account_number(self):
+        return self._account_number
 
-    def deposit(self, amount):
-        if amount > 0:
-            self._balance += amount
-            return True
-        return False
-
-    def withdraw(self, amount):
-        if 0 < amount <= self._balance:
-            self._balance -= amount
-            return True
-        return False
+    def get_customer_id(self):
+        return self._customer_id
 
     def get_balance(self):
         return self._balance
-    
-    def get_account_number(self):
-        return self._account_number
