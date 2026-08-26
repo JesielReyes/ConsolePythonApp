@@ -17,12 +17,12 @@ def create_account(
         balance=balance
     )
 
-    #adds and commits the account to the database, then refreshes the saved record
+    #adds and commits the accountrecord object to the database, then refreshes the saved record
     session.add(account)
     session.commit()
     session.refresh(account)
 
-    #returns the account to the api that called this function
+    #returns the accountrecord object to the api that called this function
     return account
 
 #used to find an account using the account number

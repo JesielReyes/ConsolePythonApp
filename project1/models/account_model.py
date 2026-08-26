@@ -4,7 +4,7 @@ import random
 
 from sqlmodel import Field, SQLModel
 
-#this cass is used to represent the overall databse table structure, shows us what each row will contain
+#this class is used to represent the overall databse table structure, shows us what each row will contain
 class AccountRecord(SQLModel, table=True):
     account_number: int | None = Field(
         default_factory=lambda: random.randint(10000000, 99999999),
