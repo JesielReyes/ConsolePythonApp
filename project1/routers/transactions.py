@@ -53,3 +53,23 @@ def read_transaction_history(
             "Error",
             str(e)
         )
+
+@router.get("/{owner_id}/categories")
+def read_transaction_categories(
+    owner_id: int,
+    session: SessionDep
+):
+    try:
+        categories = service.transaction_service.fetchTransactionCategories(session, owner_id)
+        return ResponseDTO(
+            200,
+            "Fetch Success",
+            categories
+        )
+    except Exception as e:
+        return ResponseDTO(
+            500,
+            "Error",
+            str(e)
+        )
+    

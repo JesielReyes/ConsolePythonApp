@@ -32,3 +32,13 @@ class TransferTransaction(BaseModel):
 class FetchTransactions(BaseModel):
     user_id: int
     account_number: int
+
+class defaultCategories(str, Enum):
+    FOOD = "food"
+    ENTERTAINMENT = "entertainment"
+    UTILITIES = "utilities"
+    TRANSPORTATION = "transportation"
+    HEALTHCARE = "healthcare"
+    EDUCATION = "education"
+    PERSONAL_CARE = "personal_care"
+    MISCELLANEOUS = "miscellaneous"

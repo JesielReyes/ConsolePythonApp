@@ -1,4 +1,4 @@
-from models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
+from models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions, defaultCategories
 from sqlmodel import Session
 from repository.accountsRepo import get_user_account_by_number, get_account_by_number
 from repository.transactionRepo import save_transaction, get_transactions
@@ -93,3 +93,7 @@ def transfer(session: Session, transfer: TransferTransaction):
 
 def fetchTransactions(session: Session, fetch: FetchTransactions):
     return get_transactions(session, fetch.user_id, fetch.account_number)
+
+def fetchTransactionCategories(session: Session, owner_id: int):
+    # TODO: support custom categories in the future
+    return list(defaultCategories)
