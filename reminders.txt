@@ -15,16 +15,17 @@ source .venv/bin/activate
 set local database url
 export DATABASE_URL="postgresql+psycopg://jesiel@localhost:5432/bank_db3"
 start fastapi
-uvicorn project1.main:app --reload
+cd project1
+uvicorn main:app --reload
 
 open api docs on browser
 http://127.0.0.1:8000/docs
 
 test create account
 {
-  "owner_id": 1,
+  "owner_id": "CUSTOMER_UUID",
   "account_type": "Checking",
-  "balance": 100
+  "amount": 100
 }
 
 stop the app
