@@ -12,6 +12,9 @@ cd /Users/jesiel/Documents/GitHub/ConsolePythonApp
 start the local environment 
 source .venv/bin/activate
 
+install requirements if you dont have them
+pip install -r requirements.txt
+
 set local database url
 export DATABASE_URL="postgresql+psycopg://jesiel@localhost:5432/bank_db3"
 start fastapi
@@ -33,3 +36,12 @@ control C
 
 stop postgres
 brew services stop postgresql@18
+
+Steps for starting front end
+cd frontend
+npm ci
+cp .env.example .env
+npm run dev
+
+front end will be here 
+http://localhost:5173
