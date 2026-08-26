@@ -1,12 +1,11 @@
-from users.user import User
-from account.CheckingAccount import CheckingAccount
-from account.SavingsAccount import SavingsAccount
+from models.user import User
+from models.CheckingAccount import CheckingAccount
+from models.SavingsAccount import SavingsAccount
 
 
 class Customer(User):
-
-    def __init__(self, pin, owner_id=None):
-        super().__init__(pin, owner_id)
+    def __init__(self, email, owner_id, birthday, phone_number, first_name, last_name):
+        super().__init__(email, owner_id, birthday, phone_number, first_name, last_name)
 
         self._accounts = {
             "Checking": {},
@@ -39,91 +38,10 @@ class Customer(User):
 
         self._accounts[account_type][account_number] = account
 
-        return account_number
+        return account
 
     def get_accounts(self, pin):
         if not self.check_pin(pin):
             raise ValueError("Invalid PIN")
 
         return self._accounts
-
-    def get_account(
-        self,
-        pin,
-        account_type,
-        account_number
-    ):
-        if not self.check_pin(pin):
-            raise ValueError("Invalid PIN")
-
-        if account_type not in self._accounts:
-            raise ValueError("Invalid account type")
-
-        if account_number not in self._accounts[account_type]:
-            raise ValueError("Account does not exist")
-
-        return self._accounts[account_type][account_number]
-
-    def deposit(
-        self,
-        pin,
-        account_type,
-        account_number,
-        amount
-    ):
-        account = self.get_account(
-            pin,
-            account_type,
-            account_number
-        )
-
-        if not account.deposit(amount):
-            raise ValueError("Deposit failed")
-
-        return True
-
-    def withdraw(
-        self,
-        pin,
-        account_type,
-        account_number,
-        amount
-    ):
-        account = self.get_account(
-            pin,
-            account_type,
-            account_number
-        )
-
-        if not account.withdraw(amount):
-            raise ValueError("Withdrawal failed")
-
-        return True
-
-    def transfer_funds(
-        self,
-        pin,
-        from_account_type,
-        from_account_number,
-        to_account_type,
-        to_account_number,
-        amount
-    ):
-        from_account = self.get_account(
-            pin,
-            from_account_type,
-            from_account_number
-        )
-
-        to_account = self.get_account(
-            pin,
-            to_account_type,
-            to_account_number
-        )
-
-        if not from_account.withdraw(amount):
-            raise ValueError("Transfer failed")
-
-        to_account.deposit(amount)
-
-        return True

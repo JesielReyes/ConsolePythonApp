@@ -20,6 +20,7 @@ All accounts should have:
 A user id (Customer only) denoting who owns it
 Account number
 Balance details (USD and cents)
+account type
 
 Checking account specifically:
 Allowed to overdraft (fee of our choosing)

@@ -1,6 +1,5 @@
 import random
 
-
 class Account:
     def __init__(self, account_type, balance=0, owner_id=None):
         if balance < 0:
@@ -11,7 +10,6 @@ class Account:
         self._account_type = account_type
         self._owner_id = owner_id
         self._account_number = random.randint(10000000, 99999999)
-
 
     def deposit(self, amount):
         if amount > 0:

@@ -1,0 +1,34 @@
+steps for testing local database
+
+start up postgres on local machine
+brew services start postgresql@18
+
+verify that postgres is running
+pg_isready
+
+go to project folder
+cd /Users/jesiel/Documents/GitHub/ConsolePythonApp
+
+start the local environment 
+source .venv/bin/activate
+
+set local database url
+export DATABASE_URL="postgresql+psycopg://jesiel@localhost:5432/bank_db3"
+start fastapi
+uvicorn project1.main:app --reload
+
+open api docs on browser
+http://127.0.0.1:8000/docs
+
+test create account
+{
+  "owner_id": 1,
+  "account_type": "Checking",
+  "balance": 100
+}
+
+stop the app
+control C
+
+stop postgres
+brew services stop postgresql@18
