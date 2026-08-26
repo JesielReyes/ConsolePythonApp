@@ -12,4 +12,4 @@ class AccountRecord(SQLModel, table=True):
     )
     owner_id: int = Field(gt=0) #ex: field shows that in this column the name of it will be owner_id and it will hold an int
     account_type: str
-    balance: float = Field(default=0, ge=0)
+    balance: float = Field(default=0)

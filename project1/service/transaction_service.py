@@ -34,8 +34,15 @@ def withdrawal(session: Session, acc: AccountTransaction):
         if not account:
             raise Exception("No Such Account")
         
-        if account.balance < acc.amount:
-            raise Exception("Insufficent Funds")
+        if account.account_type != "Checking":
+            if account.balance < acc.amount:
+                raise Exception("Insufficient Funds")
+        
+        if account.account_type == "Checking":
+            overdraft_limit = 500
+        
+            if account.balance - acc.amount < -overdraft_limit:
+                raise Exception("Overdraft limit exceeded")
         
         account.balance -= acc.amount
 
