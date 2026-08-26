@@ -1,8 +1,8 @@
 from sqlmodel import Session, select
 
-from project1.dto.user_db import UserDB
-from project1.models.admin import Admin
-from project1.models.customer import Customer
+from dto.user_db import UserDB
+from models.admin import Admin
+from models.customer import Customer
 
 
 def db_user_to_domain(db_user):

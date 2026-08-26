@@ -1,7 +1,7 @@
-from project1.models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
+from models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
 from sqlmodel import Session
-from project1.repository.accountsRepo import get_user_account_by_number, get_account_by_number
-from project1.repository.transactionRepo import save_transaction, get_transactions
+from repository.accountsRepo import get_user_account_by_number, get_account_by_number
+from repository.transactionRepo import save_transaction, get_transactions
 
 
 def deposit(session: Session, acc: AccountTransaction):
@@ -17,7 +17,7 @@ def deposit(session: Session, acc: AccountTransaction):
             to_account_number=acc.account_number
         )
 
-        save_transaction(trans)
+        save_transaction(session, trans)
 
         session.commit()
         session.refresh(account)
@@ -46,7 +46,7 @@ def withdrawal(session: Session, acc: AccountTransaction):
             from_account_number=acc.account_number
         )
 
-        save_transaction(trans)
+        save_transaction(session, trans)
 
         session.commit()
         session.refresh(account)
@@ -82,7 +82,7 @@ def transfer(session: Session, transfer: TransferTransaction):
             to_account_number=transfer.to_account_number
         )
 
-        save_transaction(trans)
+        save_transaction(session, trans)
 
         session.commit()
         

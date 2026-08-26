@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from project1.models.account_model import AccountRecord
+from models.account_model import AccountRecord
 
 def get_user_account_by_number(session: Session, user_id: int, account_num: int):
     statement = select(AccountRecord).where(

@@ -1,4 +1,4 @@
-from project1.models.transaction import Transaction
+from models.transaction import Transaction
 from sqlmodel import Session, select
 from sqlalchemy import or_
 

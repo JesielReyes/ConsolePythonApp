@@ -4,15 +4,16 @@ from typing import Annotated #this is used to create a type hint for our session
 from fastapi import Depends #this is going to tell fastapi that we want to use the results from another function before we run the function we are currently in. We will be using it to get our database session before running our routers
 from sqlmodel import Session, SQLModel, create_engine #we use sessions to communicate with the database, SQLModel is used to define the base of our metadata, and create_engine creates a connection manager for our database
 
-from project1.models.account_model import AccountRecord #imports the account table model we made so SQLModel knows the layout when creating our database tables
+from models.account_model import AccountRecord #imports the account table model we made so SQLModel knows the layout when creating our database tables
 
 #assigns our database url to DATABASE_URL using os to grab it from the environmant variables in the terminal, raises an error if not set
-DATABASE_URL = os.getenv("DATABASE_URL")
+# DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
-    raise RuntimeError(
-        "DATABASE_URL must be set before starting the application"
-    )
+# if not DATABASE_URL:
+#     raise RuntimeError(
+#         "DATABASE_URL must be set before starting the application"
+#     )
+DATABASE_URL = "postgresql+psycopg://root:root@localhost:5432/bank"
 #an engine is just a connection manager. It will know what database to connect to, which driver to use, how to open the connections for the databse, and how to manage and reuse those connections.
 engine = create_engine(DATABASE_URL)
 

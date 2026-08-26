@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from project1.models.transaction import AccountTransaction, TransferTransaction, FetchTransactions
-from project1.database import SessionDep
-import project1.service.transaction_service
-from project1.dto import ResponseDTO
+from models.transaction import AccountTransaction, TransferTransaction, FetchTransactions
+from database import SessionDep
+import service.transaction_service
+from dto.ResponseDTO import ResponseDTO
 
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 def deposit(transaction: AccountTransaction, session: SessionDep):
     
     try:
-        account = project1.service.transaction_service.deposit(session, transaction)
+        account = service.transaction_service.deposit(session, transaction)
         return ResponseDTO(200, "Deposit Success", account)
     except Exception as e:
         return ResponseDTO(500, "Error", str(e))
@@ -21,7 +21,7 @@ def deposit(transaction: AccountTransaction, session: SessionDep):
 def withdraw(transaction: AccountTransaction, session: SessionDep):
     
     try:
-        account = project1.service.transaction_service.withdrawal(session, transaction)
+        account = service.transaction_service.withdrawal(session, transaction)
         return ResponseDTO(200, "Deposit Success", account)
     except Exception as e:
         return ResponseDTO(500, "Error", str(e))
@@ -30,7 +30,7 @@ def withdraw(transaction: AccountTransaction, session: SessionDep):
 def transfer(transaction: TransferTransaction, session: SessionDep):
     
     try:
-        project1.service.transaction_service.transfer(session, transaction)
+        service.transaction_service.transfer(session, transaction)
         return ResponseDTO(200, "Transfer Success", None)
     except Exception as e:
         return ResponseDTO(500, "Error", str(e))
@@ -42,7 +42,7 @@ def read_transaction_history(
     session: SessionDep
 ):
     try:
-        all = project1.service.transaction_service.fetchTransactions(session, fetchTransaction)
+        all = service.transaction_service.fetchTransactions(session, fetchTransaction)
         return ResponseDTO(
             200,
             "Fetch Success",

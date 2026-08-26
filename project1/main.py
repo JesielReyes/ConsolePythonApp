@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from project1.database import create_db_and_tables
-from project1.routers import accounts, transactions, users
+from database import create_db_and_tables
+from routers import accounts, transactions, users
 
 
 @asynccontextmanager
