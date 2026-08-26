@@ -121,6 +121,27 @@ brew services stop postgresql
 pg_isready
 ```
 
+## Automated onboarding
+
+On macOS/Linux, or Windows through WSL or Git Bash, `onboard.sh` automates
+environment creation, dependency installation, database configuration, and
+API startup:
+
+```bash
+./onboard.sh
+```
+
+The default profile starts the Docker PostgreSQL service. To use native
+PostgreSQL, provide `DATABASE_URL` and select the native profile:
+
+```bash
+DATABASE_URL="postgresql+psycopg://<user>:<password>@127.0.0.1:5432/<database>" ./onboard.sh --db native
+```
+
+Use `./onboard.sh --no-api` to prepare the environment without starting the
+long-running API process. The script uses `uv` when available and falls back
+to Python's standard `venv` and `pip` commands.
+
 ## Run the API
 
 With the venv active and `DATABASE_URL` set, run this existing command from the repository root:
