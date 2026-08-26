@@ -56,3 +56,11 @@ def transfer(transaction: TransferTransaction, session: SessionDep, owner_id: UU
 def read_transaction_history(session: SessionDep, owner_id: UUID):
     user = get_db_user(session, owner_id)
     return transaction_service.fetch_transactions(session, owner_id, user.is_admin)
+
+@router.get("/{owner_id}/categories")
+def read_transaction_categories(
+    owner_id: UUID,
+    session: SessionDep
+):
+    return transaction_service.fetchTransactionCategories(session, owner_id)
+

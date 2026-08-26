@@ -1,3 +1,5 @@
+from models.transaction import FetchTransactions, defaultCategories
+
 from sqlmodel import Session
 
 from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction
@@ -66,3 +68,8 @@ def transfer(session: Session, request: TransferTransaction, owner_id):
 
 def fetch_transactions(session: Session, owner_id, is_admin=False):
     return get_transactions(session, owner_id, is_admin)
+
+def fetchTransactionCategories(session: Session, owner_id):
+    # TODO: support custom categories in the future
+    return list(defaultCategories)
+
