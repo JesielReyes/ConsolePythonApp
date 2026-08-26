@@ -1,4 +1,4 @@
-from account.account import Account
+from models.account import Account
 class CheckingAccount(Account):
     def __init__(self, balance=0, owner_id=None):
         super().__init__("Checking", balance, owner_id)

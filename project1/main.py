@@ -5,15 +5,19 @@ from fastapi.responses import JSONResponse
 from routers import accounts, users
 from contextlib import asynccontextmanager
 from project1.database import create_db_and_tables
+from contextlib import asynccontextmanager
 
-#defines the lifespan of the function
+from fastapi import FastAPI
+
+from database import create_db_and_tables
+from routers import accounts, users, transactions
+
+
 @asynccontextmanager
-async def lifespan(app: FastAPI): #
-	create_db_and_tables() #runs when the application starts, creating the table if it currently doesnt exist
-	yield #code before yield will run during startup, code after yield will run during the shutdown. and fastapi runs the app while we are paused here at yiled
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
 
-#creates our fastapi app and lets it know to use our lifespan function. without this fastapi wouldnt know to run the function upon startup
-app = FastAPI(lifespan=lifespan)
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
@@ -30,3 +34,21 @@ async def validation_exception_handler(
     )
 
 app.include_router(accounts.router, prefix="/accounts", tags=["accounts"])
+app = FastAPI(
+    title="Banking API",
+    lifespan=lifespan
+)
+
+
+app.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"]
+)
+
+
+# app.include_router(
+#     transactions.router,
+#     prefix="/transactions",
+#     tags=["transactions"]
+# )

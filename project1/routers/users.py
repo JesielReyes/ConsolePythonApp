@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
+from database import SessionDep
 from service import user_service
 
 
@@ -20,8 +21,12 @@ def user_to_dict(user):
 
 
 @router.get("")
-def list_users():
-    users = user_service.get_all_users()
+def list_users(
+    session: SessionDep
+):
+    users = user_service.get_all_users(
+        session
+    )
 
     return {
         "users": [
@@ -32,9 +37,15 @@ def list_users():
 
 
 @router.get("/{user_id}")
-def read_user(user_id: int):
+def read_user(
+    user_id: int,
+    session: SessionDep
+):
     try:
-        user = user_service.get_user(user_id)
+        user = user_service.get_user(
+            session,
+            user_id
+        )
 
         return user_to_dict(user)
 
@@ -44,28 +55,34 @@ def read_user(user_id: int):
             detail=str(error)
         )
 
-#
-@router.post("", status_code=status.HTTP_201_CREATED)
-def create_user(user_request: UserCreate):
-    try:
-        user = user_service.create_user(
-            pin=user_request.pin,
-            is_admin=user_request.is_admin
-        )
 
-        return user_to_dict(user)
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED
+)
+def create_user(
+    user_request: UserCreate,
+    session: SessionDep
+):
+    user = user_service.create_user(
+        session,
+        pin=user_request.pin,
+        is_admin=user_request.is_admin
+    )
 
-    except ValueError as error:
-        raise HTTPException(
-            status_code=400,
-            detail=str(error)
-        )
+    return user_to_dict(user)
 
-#admin specifc
+
 @router.delete("/{user_id}")
-def delete_user(user_id: int):
+def delete_user(
+    user_id: int,
+    session: SessionDep
+):
     try:
-        user_service.delete_user(user_id)
+        user_service.delete_user(
+            session,
+            user_id
+        )
 
         return {
             "user_id": user_id,
@@ -74,6 +91,6 @@ def delete_user(user_id: int):
 
     except ValueError as error:
         raise HTTPException(
-            status_code=400,
+            status_code=404,
             detail=str(error)
         )

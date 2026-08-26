@@ -4,7 +4,8 @@ from database import SessionDep
 import service.transaction_service
 from dto import ResponseDTO
 
-router = APIRouter()
+
+# router = APIRouter()
 
 
 @router.post("/deposit")
