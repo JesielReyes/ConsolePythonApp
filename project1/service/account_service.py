@@ -1,44 +1,33 @@
-from repositories import user_repository
-from repositories import account_repository
+#import select so we can query our database
+from sqlmodel import Session, select
 
+from project1.models.account_model import AccountRecord
 
+#used to create a new account in the database
 def create_account(
+    session: Session, #the session we will use to communicate with the db
     owner_id,
-    pin,
     account_type,
     balance
 ):
-    user = user_repository.get_user(owner_id)
-
-    if user is None:
-        raise ValueError("User not found")
-
-    if user.get_role() != "Customer":
-        raise ValueError(
-            "Only customers can create accounts"
-        )
-
-    account_number = user.create_account(
-        pin,
-        account_type,
-        balance
+    #creates a new account record object
+    account = AccountRecord(
+        owner_id=owner_id,
+        account_type=account_type,
+        balance=balance
     )
 
-    account = user.get_account(
-        pin,
-        account_type,
-        account_number
-    )
+    #adds and commits the account to the database, since account number is generated during insertion we must refresh so we can get the account number from the database
+    session.add(account)
+    session.commit()
+    session.refresh(account)
 
-    account_repository.add_account(account)
-
+    #returns the account to the api that called this function
     return account
 
-
-def get_account(account_number):
-    account = account_repository.get_account(
-        account_number
-    )
+#used to find an account using the account number
+def get_account(session: Session, account_number):
+    account = session.get(AccountRecord, account_number)
 
     if account is None:
         raise ValueError("Account not found")
@@ -46,26 +35,31 @@ def get_account(account_number):
     return account
 
 
-def get_accounts(owner_id=None):
+def get_accounts(session: Session, owner_id=None):
+    #select state is used to query our database
+    statement = select(AccountRecord)
+
+    #if no id is provided return all accounts, this will be for admins
     if owner_id is None:
-        return account_repository.get_all_accounts()
+        return session.exec(statement).all()
 
-    return account_repository.get_accounts_by_owner(
-        owner_id
-    )
+    #if an id is provided return only the accounts owned by that id
+    statement = statement.where(AccountRecord.owner_id == owner_id)
+    return session.exec(statement).all()
 
 
-def delete_account(account_number):
-    account = get_account(account_number)
+def delete_account(session: Session, account_number):
+    account = get_account(session, account_number)
 
+    #an account must have a zero balance to be deleted
     if account.get_balance() != 0:
         raise ValueError(
             "Account balance must be zero before deletion"
         )
 
-    if not account_repository.delete_account(
-        account_number
-    ):
-        raise ValueError("Account could not be deleted")
+    #deletes the account from our database
+    session.delete(account)
+    #commits the changes
+    session.commit()
 
     return True
