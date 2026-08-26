@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "Citi Training Database",
+            "database": "bank_db",
+            "username": "jesiel",
+            "password": "postgres"
+        }
+    ]
+}
