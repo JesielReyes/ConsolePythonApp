@@ -13,7 +13,7 @@ from models.account_model import AccountRecord #imports the account table model 
 #     raise RuntimeError(
 #         "DATABASE_URL must be set before starting the application"
 #     )
-DATABASE_URL = "postgresql+psycopg://root:root@localhost:5432/bank"
+DATABASE_URL = os.getenv("DATABASE_URL")
 #an engine is just a connection manager. It will know what database to connect to, which driver to use, how to open the connections for the databse, and how to manage and reuse those connections.
 engine = create_engine(DATABASE_URL)
 
