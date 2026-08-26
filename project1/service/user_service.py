@@ -1,3 +1,6 @@
+from hashlib import sha256
+from uuid import UUID
+
 from sqlmodel import Session, select
 
 from dto.user_db import UserDB
@@ -6,15 +9,15 @@ from models.customer import Customer
 
 
 def db_user_to_domain(db_user):
-    if db_user.role == "Admin":
+    if db_user.is_admin:
         return Admin(
-            pin=db_user.pin,
-            owner_id=db_user.id
+            email=db_user.email, owner_id=db_user.id, birthday=db_user.birthday,
+            phone_number=db_user.phone_number, first_name=db_user.first_name, last_name=db_user.last_name
         )
 
     return Customer(
-        pin=db_user.pin,
-        owner_id=db_user.id
+        email=db_user.email, owner_id=db_user.id, birthday=db_user.birthday,
+        phone_number=db_user.phone_number, first_name=db_user.first_name, last_name=db_user.last_name
     )
 
 
@@ -31,7 +34,7 @@ def get_all_users(session: Session):
 
 def get_user(
     session: Session,
-    user_id: int
+    user_id: UUID
 ):
     db_user = session.get(
         UserDB,
@@ -46,18 +49,12 @@ def get_user(
 
 def create_user(
     session: Session,
-    pin: int,
-    is_admin: bool
+    email: str, password: str, is_admin: bool, birthday, phone_number: str,
+    first_name: str, last_name: str
 ):
-    role = (
-        "Admin"
-        if is_admin
-        else "Customer"
-    )
-
     db_user = UserDB(
-        pin=pin,
-        role=role
+        email=email, password_hash=sha256(password.encode()).hexdigest(), is_admin=is_admin,
+        birthday=birthday, phone_number=phone_number, first_name=first_name, last_name=last_name
     )
 
     session.add(db_user)
@@ -83,3 +80,17 @@ def delete_user(
     session.commit()
 
     return True
+
+
+def authenticate(session: Session, email: str, password: str):
+    user = session.exec(select(UserDB).where(UserDB.email == email)).first()
+    if user is None or user.password_hash != sha256(password.encode()).hexdigest():
+        raise ValueError("Invalid email or password")
+    return user
+
+
+def get_db_user(session: Session, user_id: UUID):
+    user = session.get(UserDB, user_id)
+    if user is None:
+        raise ValueError("User not found")
+    return user

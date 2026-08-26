@@ -1,95 +1,68 @@
-from models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
 from sqlmodel import Session
-from repository.accountsRepo import get_user_account_by_number, get_account_by_number
-from repository.transactionRepo import save_transaction, get_transactions
+
+from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction
+from repository.accountsRepo import get_account_by_number, get_user_account_by_number
+from repository.transactionRepo import get_transactions, save_transaction
 
 
-def deposit(session: Session, acc: AccountTransaction):
+def deposit(session: Session, request: DepositTransaction, owner_id):
+    account = get_user_account_by_number(session, owner_id, request.account_number)
+    if account is None:
+        raise ValueError("Account does not exist")
+    account.balance += float(request.amount)
+    save_transaction(session, Transaction(
+        type=TransactionType.DEPOSIT, from_owner_id=owner_id,
+        from_owner_account_number=request.account_number,
+        description=None, category=None, amount=request.amount,
+    ))
+    session.commit()
+    session.refresh(account)
+    return account
+
+
+def withdrawal(session: Session, request: WithdrawalTransaction, owner_id, transaction_type=TransactionType.WITHDRAWAL):
+    account = get_user_account_by_number(session, owner_id, request.account_number)
+    if account is None:
+        raise ValueError("Account does not exist")
+    amount = float(request.amount)
+    current = account.balance
+    if account.account_type != "Checking" and amount > current:
+        raise ValueError("Insufficient funds")
+    if account.account_type == "Checking" and current - amount < -50000:
+        raise ValueError("Overdraft limit exceeded")
+    account.balance = current - amount
+    save_transaction(session, Transaction(
+        type=transaction_type, from_owner_id=owner_id,
+        from_owner_account_number=request.account_number,
+        description=request.description, category=request.category, amount=request.amount,
+    ))
+    session.commit()
+    session.refresh(account)
+    return account
+
+
+def transfer(session: Session, request: TransferTransaction, owner_id):
     try:
-        account = get_user_account_by_number(session, acc.user_id, acc.account_number)
-        
-        account.balance += acc.amount
-
-        trans = Transaction(
-            type=TransactionType.DEPOSIT,
-            amount=acc.amount,
-            from_user_id=acc.user_id,
-            to_account_number=acc.account_number
-        )
-
-        save_transaction(trans)
-
+        source = get_user_account_by_number(session, owner_id, request.from_account_number)
+        target = get_account_by_number(session, request.to_account_number)
+        if source is None or target is None or target.owner_id != str(request.to_owner_id):
+            raise ValueError("Account does not exist or is not owned by the specified user")
+        amount = float(request.amount)
+        if amount > source.balance:
+            raise ValueError("Insufficient funds")
+        source.balance -= amount
+        target.balance += amount
+        save_transaction(session, Transaction(
+            type=TransactionType.TRANSFER, from_owner_id=owner_id,
+            from_owner_account_number=request.from_account_number,
+            to_owner_id=request.to_owner_id, to_owner_account_number=request.to_account_number,
+            description=None, category=None, amount=request.amount,
+        ))
         session.commit()
-        session.refresh(account)
-
-        return account
-    
     except Exception:
         session.rollback()
         raise
 
-def withdrawal(session: Session, acc: AccountTransaction):
-    try:
-        account = get_user_account_by_number(session, acc.user_id, acc.account_number)
-        if not account:
-            raise Exception("No Such Account")
-        
-        if account.balance < acc.amount:
-            raise Exception("Insufficent Funds")
-        
-        account.balance -= acc.amount
 
-        trans = Transaction(
-            type=TransactionType.WITHDRAWL,
-            amount=acc.amount,
-            from_user_id=acc.user_id,
-            from_account_number=acc.account_number
-        )
-
-        save_transaction(trans)
-
-        session.commit()
-        session.refresh(account)
-
-        return account
-    except Exception:
-        session.rollback()
-        raise
-
-
-def transfer(session: Session, transfer: TransferTransaction):
-
-    try:
-        from_account = get_user_account_by_number(session, transfer.owner_id, transfer.from_account_number)
-        if not from_account:
-            raise Exception("Account Does Not Exist")
-        
-        to_account = get_account_by_number(session, transfer.to_account_number)
-        if not to_account:
-            raise Exception("Account Does Not Exist")
-        
-        if transfer.amount > from_account.balance:
-            raise Exception("Insufficent Funds")
-        
-        from_account.balance -= transfer.amount
-        to_account.balance += transfer.amount
-
-        trans = Transaction(
-            type=TransactionType.TRANSFER,
-            amount=transfer.amount,
-            from_user_id=transfer.owner_id,
-            from_account_number=transfer.from_account_number,
-            to_account_number=transfer.to_account_number
-        )
-
-        save_transaction(trans)
-
-        session.commit()
-        
-    except Exception as e:
-        session.rollback()
-        raise
-
-
-def fetchTransactions(session: Session, fetch: FetchTransactions):
-    return get_transactions(session, fetch.user_id, fetch.account_number)
+def fetch_transactions(session: Session, owner_id, is_admin=False):
+    return get_transactions(session, owner_id, is_admin)

@@ -4,8 +4,8 @@ from models.SavingsAccount import SavingsAccount
 
 
 class Customer(User):
-    def __init__(self, pin, owner_id=None):
-        super().__init__(pin, owner_id)
+    def __init__(self, email, owner_id, birthday, phone_number, first_name, last_name):
+        super().__init__(email, owner_id, birthday, phone_number, first_name, last_name)
 
         self._accounts = {
             "Checking": {},

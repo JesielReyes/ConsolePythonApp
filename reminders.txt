@@ -13,8 +13,7 @@ start the local environment
 source .venv/bin/activate
 
 set local database url
-export DATABASE_URL="postgresql+psycopg://jesiel@localhost:5432/bank_db"
-
+export DATABASE_URL="postgresql+psycopg://jesiel@localhost:5432/bank_db3"
 start fastapi
 uvicorn project1.main:app --reload
 

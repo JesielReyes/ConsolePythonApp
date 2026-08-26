@@ -1,9 +1,14 @@
 from typing import Literal
+from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from database import SessionDep
 from service import account_service
+<<<<<<< HEAD
+=======
+from service.user_service import get_db_user
+>>>>>>> origin/main
 
 router = APIRouter()
 
@@ -11,10 +16,11 @@ router = APIRouter()
 AccountType = Literal["Checking", "Savings"]
 
 #this class is used to define the structure and validation rules of the data our api will recieve when creating accounts
+from decimal import Decimal
 class AccountCreate(BaseModel):
-    owner_id: int = Field(gt=0)
+    owner_id: UUID
     account_type: AccountType
-    balance: float = Field(default=0, ge=0)
+    amount: Decimal = Field(default=Decimal("0.00"), ge=0, max_digits=12, decimal_places=2)
 
 #converts an account object to a dictionary so we can return it as a json
 def account_to_dict(account):
@@ -22,16 +28,25 @@ def account_to_dict(account):
         "account_number": account.account_number,
         "owner_id": account.owner_id,
         "balance": account.balance,
-        "account_type": account.account_type
+        "account_type": account.account_type,
+        "created_date": account.created_date,
+        "is_active": account.is_active,
+        "closed_date": account.closed_date,
     }
 
 #this can eitherbe used to get all acounts or just the accounts that have a specific owner id
 @router.get("")
 def list_accounts(
     session: SessionDep,
-    owner_id: int | None = Query(default=None, gt=0)
+    requester_id: UUID = Query(...),
+    owner_id: UUID | None = Query(default=None)
 ):
     try:
+        requester = get_db_user(session, requester_id)
+        if not requester.is_admin:
+            if owner_id is not None and owner_id != requester_id:
+                raise HTTPException(status_code=403, detail="Customers can only see their own accounts")
+            owner_id = requester_id
         accounts = account_service.get_accounts(session, owner_id)
 
         return {
@@ -71,14 +86,18 @@ def read_account(account_number: int, session: SessionDep):
 )
 def create_account(
     account_request: AccountCreate,
-    session: SessionDep
+    session: SessionDep,
+    requester_id: UUID = Query(...)
 ):
     try:
+        requester = get_db_user(session, requester_id)
+        if requester.is_admin or account_request.owner_id != requester_id:
+            raise HTTPException(status_code=403, detail="Only customers can create their own accounts")
         account = account_service.create_account(
             session=session,
             owner_id=account_request.owner_id,
             account_type=account_request.account_type,
-            balance=account_request.balance
+            balance=float(account_request.amount)
         )
 
         return account_to_dict(account)

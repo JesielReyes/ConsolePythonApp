@@ -4,11 +4,12 @@ from sqlmodel import Session, select
 from models.account_model import AccountRecord
 
 #used to create a new account in the database
+from decimal import Decimal
 def create_account(
     session: Session, #the session we will use to communicate with the db
     owner_id,
     account_type,
-    balance
+    balance=0
 ):
     #creates a new account record object
     account = AccountRecord(
