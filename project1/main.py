@@ -1,9 +1,10 @@
-#this will be used to create an asynchronus context manager
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
+from project1.routers import transactions
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from routers import accounts, users
+from contextlib import asynccontextmanager
 from project1.database import create_db_and_tables
-from project1.routers import accounts #only include accounts router for my specifc testing
 
 #defines the lifespan of the function
 @asynccontextmanager
@@ -14,5 +15,18 @@ async def lifespan(app: FastAPI): #
 #creates our fastapi app and lets it know to use our lifespan function. without this fastapi wouldnt know to run the function upon startup
 app = FastAPI(lifespan=lifespan)
 
-#this adds all of the routes from accounts.py to our main fastapi app
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exception: RequestValidationError
+):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status_code": 422,
+            "message": "Invalid request",
+            "data": exception.errors()
+        }
+    )
+
 app.include_router(accounts.router, prefix="/accounts", tags=["accounts"])
