@@ -1,3 +1,10 @@
+Updated onboarding instructions are maintained in README.md.
+
+See the README for Windows PowerShell and macOS/Linux commands, the Docker
+PostgreSQL workflow, the native PostgreSQL workflow, and environment setup.
+
+----------------------------------------------------------------------------
+
 steps for testing local database
 
 start up postgres on local machine
