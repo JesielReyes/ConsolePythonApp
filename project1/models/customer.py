@@ -1,6 +1,6 @@
-from models.user import User
-from models.CheckingAccount import CheckingAccount
-from models.SavingsAccount import SavingsAccount
+from project1.models.user import User
+from project1.models.CheckingAccount import CheckingAccount
+from project1.models.SavingsAccount import SavingsAccount
 
 
 class Customer(User):

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 
-from database import SessionDep
-from service import user_service
+from project1.database import SessionDep
+from project1.service import user_service
 
 
 router = APIRouter()

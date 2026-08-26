@@ -1,4 +1,4 @@
-from models.user import User
+from project1.models.user import User
 
 
 class Admin(User):

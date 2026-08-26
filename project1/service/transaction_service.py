@@ -1,7 +1,7 @@
-from models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
+from project1.models.transaction import AccountTransaction, TransferTransaction, Transaction, TransactionType, FetchTransactions
 from sqlmodel import Session
-from repository.accountsRepo import get_user_account_by_number, get_account_by_number
-from repository.transactionRepo import save_transaction, get_transactions
+from project1.repository.accountsRepo import get_user_account_by_number, get_account_by_number
+from project1.repository.transactionRepo import save_transaction, get_transactions
 
 
 def deposit(session: Session, acc: AccountTransaction):

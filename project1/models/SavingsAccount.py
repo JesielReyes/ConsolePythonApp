@@ -1,4 +1,4 @@
-from models.account import Account
+from project1.models.account import Account
 
 
 class SavingsAccount(Account):
