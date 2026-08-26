@@ -17,7 +17,7 @@ def create_account(
         balance=balance
     )
 
-    #adds and commits the account to the database, since account number is generated during insertion we must refresh so we can get the account number from the database
+    #adds and commits the account to the database, then refreshes the saved record
     session.add(account)
     session.commit()
     session.refresh(account)
