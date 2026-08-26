@@ -2,8 +2,8 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
-from project1.database import SessionDep
-from project1.service import account_service
+from database import SessionDep
+from service import account_service
 
 router = APIRouter()
 

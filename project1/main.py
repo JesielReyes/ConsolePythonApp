@@ -1,22 +1,24 @@
-from fastapi import FastAPI, Request
-from project1.routers import transactions
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from routers import accounts, users
-from contextlib import asynccontextmanager
-from project1.database import create_db_and_tables
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from database import create_db_and_tables
 from routers import accounts, users, transactions
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
+
+
+app = FastAPI(
+    title="Banking API",
+    lifespan=lifespan
+)
 
 
 @app.exception_handler(RequestValidationError)
@@ -33,12 +35,12 @@ async def validation_exception_handler(
         }
     )
 
-app.include_router(accounts.router, prefix="/accounts", tags=["accounts"])
-app = FastAPI(
-    title="Banking API",
-    lifespan=lifespan
-)
 
+app.include_router(
+    accounts.router,
+    prefix="/accounts",
+    tags=["accounts"]
+)
 
 app.include_router(
     users.router,
@@ -46,9 +48,8 @@ app.include_router(
     tags=["users"]
 )
 
-
-# app.include_router(
-#     transactions.router,
-#     prefix="/transactions",
-#     tags=["transactions"]
-# )
+app.include_router(
+    transactions.router,
+    prefix="/transactions",
+    tags=["transactions"]
+)

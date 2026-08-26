@@ -1,7 +1,7 @@
 #import select so we can query our database
 from sqlmodel import Session, select
 
-from project1.models.account_model import AccountRecord
+from models.account_model import AccountRecord
 
 #used to create a new account in the database
 def create_account(
