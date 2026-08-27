@@ -17,7 +17,7 @@ export function AdminAccountsPage() {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [error, setError] = useState('')
   useEffect(() => { if (!sessionUserId) return; fetchAccounts(sessionUserId, true).then(setAccounts).catch(() => setError('Live admin data could not be loaded.')) }, [sessionUserId])
-  useEffect(() => { if (!sessionUserId) return; fetchTransactions(sessionUserId).then(setTransactions).catch(() => setError('Live transaction history could not be loaded.')) }, [sessionUserId])
+  useEffect(() => { if (!sessionUserId) return; fetchTransactions(sessionUserId, true).then(setTransactions).catch(() => setError('Live transaction history could not be loaded.')) }, [sessionUserId])
   useEffect(() => { if (!sessionUserId) return; fetchUsers().then((users) => setOwnerNames(Object.fromEntries(users.map((user) => [user.id, `${user.firstName} ${user.lastName}`])))).catch(() => setError('Account owners could not be loaded.')) }, [sessionUserId])
   const signOut = () => { logout(); navigate('/') }
   const toggleStatus = async (accountNumber: string) => { const account = accounts.find((item) => item.accountNumber === accountNumber); if (!account) return; if (!sessionUserId) { setAccounts((items) => items.map((item) => item.accountNumber === accountNumber ? { ...item, isActive: !item.isActive } : item)); return } try { const updated = await updateAccountStatus(sessionUserId, accountNumber, !account.isActive); setAccounts((items) => items.map((item) => item.accountNumber === accountNumber ? updated : item)); setSelectedAccount((item) => item?.accountNumber === accountNumber ? updated : item) } catch { setError('The account status could not be updated.') } }
