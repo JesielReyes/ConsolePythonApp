@@ -74,3 +74,12 @@ def update_transaction_category(
         session, transaction_id, category, owner_id
     )
 
+@router.post("/{transaction_id}/wager")
+def create_wager(transaction_id: int, session: SessionDep, owner_id: UUID):
+    try:
+        return transaction_service.create_wager(session, transaction_id, owner_id)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
+
