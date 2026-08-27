@@ -62,7 +62,7 @@ export function DashboardPage() {
     <div className="section-heading">
       <div>
         <p className="eyebrow">SPENDING</p>
-        <h2>Spending by category</h2>
+        <h2>Spending by category this month</h2>
       </div>
     </div>
 
