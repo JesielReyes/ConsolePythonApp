@@ -104,9 +104,9 @@ def create_wager(session: Session, transaction_id: int, owner_id: UUID):
     # Update the account balance based on the wager result
     account = get_user_account_by_number(session, owner_id, transaction.from_owner_account_number)
     if wager_result == WagerResult.WIN:
-        account.balance += transaction.amount
+        account.balance += float(transaction.amount)
     else:
-        account.balance -= transaction.amount
+        account.balance -= float(transaction.amount)
 
     session.add(transaction)
     session.add(account)
