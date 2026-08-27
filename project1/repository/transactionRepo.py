@@ -6,12 +6,10 @@ def save_transaction(session: Session, transaction: Transaction):
     session.add(transaction)
     return transaction
 
-def get_transactions(session: Session, user_id: int, account_number: int):
-    statement = select(Transaction).where(
-        Transaction.from_user_id == user_id,
-        or_(
-            Transaction.from_account_number == account_number,
-            Transaction.to_account_number == account_number
+def get_transactions(session: Session, owner_id, is_admin=False):
+    statement = select(Transaction)
+    if not is_admin:
+        statement = statement.where(
+            or_(Transaction.from_owner_id == owner_id, Transaction.to_owner_id == owner_id)
         )
-    )
     return session.exec(statement).all()

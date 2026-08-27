@@ -1,16 +1,9 @@
-
-
-
-from users.user import User
+from models.user import User
 
 
 class Admin(User):
-
-    def __init__(self, pin, owner_id=None):
-        super().__init__(pin, owner_id)
+    def __init__(self, email, owner_id, birthday, phone_number, first_name, last_name):
+        super().__init__(email, owner_id, birthday, phone_number, first_name, last_name)
 
     def get_role(self):
         return "Admin"
-
-    def view_accounts(self, accounts):
-        return accounts
