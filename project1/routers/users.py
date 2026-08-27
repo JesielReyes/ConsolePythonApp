@@ -1,17 +1,17 @@
-from fastapi import APIRouter, HTTPException, status
 from datetime import date
-from pydantic import BaseModel
 from uuid import UUID
+
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, EmailStr
 
 from database import SessionDep
 from service import user_service
-
 
 router = APIRouter()
 
 
 class UserCreate(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     is_admin: bool = False
     birthday: date
@@ -19,21 +19,15 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: str
 
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-
 def user_to_dict(user):
     return {
-        "id": user.get_owner_id(),
-        "email": user.email,
+        "id": str(user.get_owner_id()),
+        "email": user.get_email(),
         "is_admin": user.get_role() == "Admin",
-        "birthday": user.birthday,
-        "phone_number": user.phone_number,
-        "first_name": user.first_name,
-        "last_name": user.last_name
+        "birthday": str(user.get_birthday()),
+        "phone_number": user.get_phone_number(),
+        "first_name": user.get_first_name(),
+        "last_name": user.get_last_name()
     }
 
 
@@ -41,9 +35,7 @@ def user_to_dict(user):
 def list_users(
     session: SessionDep
 ):
-    users = user_service.get_all_users(
-        session
-    )
+    users = user_service.get_all_users(session)
 
     return {
         "users": [
@@ -84,13 +76,22 @@ def create_user(
     try:
         user = user_service.create_user(
             session,
-            email=user_request.email, password=user_request.password, is_admin=user_request.is_admin,
-            birthday=user_request.birthday, phone_number=user_request.phone_number,
-            first_name=user_request.first_name, last_name=user_request.last_name
+            email=user_request.email,
+            password=user_request.password,
+            is_admin=user_request.is_admin,
+            birthday=user_request.birthday,
+            phone_number=user_request.phone_number,
+            first_name=user_request.first_name,
+            last_name=user_request.last_name
         )
+
         return user_to_dict(user)
+
     except ValueError as error:
-        raise HTTPException(status_code=409, detail=str(error))
+        raise HTTPException(
+            status_code=409,
+            detail=str(error)
+        )
 
 
 @router.delete("/{user_id}")
@@ -105,7 +106,7 @@ def delete_user(
         )
 
         return {
-            "user_id": user_id,
+            "user_id": str(user_id),
             "deleted": True
         }
 
@@ -114,12 +115,3 @@ def delete_user(
             status_code=404,
             detail=str(error)
         )
-
-
-@router.post("/login")
-def login(login_request: LoginRequest, session: SessionDep):
-    try:
-        user = user_service.authenticate(session, login_request.email, login_request.password)
-        return {"user_id": user.id, "is_admin": user.is_admin}
-    except ValueError as error:
-        raise HTTPException(status_code=401, detail=str(error))

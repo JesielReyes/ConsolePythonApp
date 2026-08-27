@@ -1,13 +1,55 @@
 import axios from 'axios'
 import type { Account, AccountType, Transaction, User } from '../types/banking'
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000' })
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:8000'
+})
 
-export const getSessionUserId = () => localStorage.getItem('banking_user_id')
 
-export async function login(email: string, password: string): Promise<{ userId: string; isAdmin: boolean }> {
-  const response = await api.post('/users/login', { email, password })
-  return { userId: response.data.user_id, isAdmin: response.data.is_admin }
+// Add JWT to every API request
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('banking_access_token')
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+
+  return config
+})
+
+
+export const getSessionUserId = () =>
+  localStorage.getItem('banking_user_id')
+
+
+export async function login(
+  email: string,
+  password: string
+) {
+  const response = await api.post('/login', {
+    email,
+    password
+  })
+
+  localStorage.setItem(
+    'banking_access_token',
+    response.data.access_token
+  )
+
+  localStorage.setItem(
+    'banking_user_id',
+    response.data.user_id
+  )
+
+  return {
+    userId: response.data.user_id,
+    isAdmin: response.data.is_admin
+  }
+}
+
+export function logout() {
+  localStorage.removeItem('banking_access_token')
+  localStorage.removeItem('banking_user_id')
 }
 
 export async function createUser(user: { email: string; password: string; isAdmin: boolean; birthday: string; phoneNumber: string; firstName: string; lastName: string }) {

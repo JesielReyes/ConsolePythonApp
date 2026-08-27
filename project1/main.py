@@ -2,10 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
 from database import create_db_and_tables
-from routers import accounts, transactions, users
+from routers import accounts, users, transactions, login
 
 
 @asynccontextmanager
@@ -19,9 +20,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
+    allow_origins=[
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,20 +43,31 @@ async def validation_exception_handler(
         content={
             "status_code": 422,
             "message": "Invalid request",
-            "data": exception.errors()
-        }
+            "data": exception.errors(),
+        },
     )
 
-app.include_router(accounts.router, prefix="/accounts", tags=["accounts"])
+
+app.include_router(
+    accounts.router,
+    prefix="/accounts",
+    tags=["accounts"],
+)
+
 app.include_router(
     users.router,
     prefix="/users",
-    tags=["users"]
+    tags=["users"],
 )
-
 
 app.include_router(
     transactions.router,
     prefix="/transactions",
-    tags=["transactions"]
+    tags=["transactions"],
+)
+
+app.include_router(
+    login.router,
+    prefix="/login",
+    tags=["login"],
 )
