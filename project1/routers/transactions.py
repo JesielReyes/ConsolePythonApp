@@ -58,9 +58,19 @@ def read_transaction_history(session: SessionDep, owner_id: UUID):
     return transaction_service.fetch_transactions(session, owner_id, user.is_admin)
 
 @router.get("/{owner_id}/categories")
-def read_transaction_categories(
-    owner_id: UUID,
-    session: SessionDep
-):
+@router.get("/owners/{owner_id}/categories")
+def read_transaction_categories(owner_id: UUID, session: SessionDep):
     return transaction_service.fetchTransactionCategories(session, owner_id)
+
+
+@router.put("/{transaction_id}/category")
+def update_transaction_category(
+    transaction_id: int,
+    session: SessionDep,
+    owner_id: UUID,
+    category: str | None = None,
+):
+    return transaction_service.update_transaction_category(
+        session, transaction_id, category, owner_id
+    )
 
