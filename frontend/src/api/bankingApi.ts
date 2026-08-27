@@ -77,9 +77,15 @@ const accountFromApi = (account: { account_number: number; account_type: Account
   accountNumber: String(account.account_number), accountType: account.account_type, balance: Number(account.balance), createdDate: account.created_date, isActive: account.is_active, ownerId: account.owner_id ? String(account.owner_id) : undefined,
 })
 
-const transactionFromApi = (transaction: { id: number; from_owner_account_number: number; description?: string; amount: number; transaction_date: string; category?: string; type: string }): Transaction => ({
-  id: String(transaction.id), merchant: transaction.description || transaction.type, date: new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), amount: transaction.type === 'deposit' ? Number(transaction.amount) : -Number(transaction.amount), category: transaction.category || transaction.type, accountNumber: String(transaction.from_owner_account_number),
-})
+const transactionFromApi = (transaction: { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string }, viewerId: string): Transaction => {
+  //transfers are only a credit for the recipient; everyone else sees them as money leaving their account
+  const isRecipient = transaction.type === 'transfer' && String(transaction.to_owner_id) === viewerId
+  const accountNumber = isRecipient && transaction.to_owner_account_number ? transaction.to_owner_account_number : transaction.from_owner_account_number
+  const amount = transaction.type === 'deposit' || isRecipient ? Number(transaction.amount) : -Number(transaction.amount)
+  return {
+    id: String(transaction.id), merchant: transaction.description || (isRecipient ? 'Transfer received' : transaction.type), date: new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), amount, category: transaction.category || transaction.type, accountNumber: String(accountNumber),
+  }
+}
 
 export async function fetchUser(userId: string): Promise<User> {
   const response = await api.get(`/users/${userId}`)
@@ -98,7 +104,7 @@ export async function fetchAccount(accountNumber: string): Promise<Account> {
 
 export async function fetchTransactions(userId: string): Promise<Transaction[]> {
   const response = await api.get('/transactions', { params: { owner_id: userId } })
-  return response.data.map(transactionFromApi)
+  return response.data.map((transaction: Parameters<typeof transactionFromApi>[0]) => transactionFromApi(transaction, userId))
 }
 
 export async function createAccount(userId: string, accountType: AccountType, amount = '0') {
