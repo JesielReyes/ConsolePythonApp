@@ -6,6 +6,7 @@ export type Account = {
   balance: number
   createdDate: string
   isActive: boolean
+  ownerId?: string
 }
 
 export type Transaction = {
