@@ -46,6 +46,18 @@ const transactionFromApi = (transaction: { id: number; from_owner_id: string; fr
   }
 }
 
+type ApiTransaction = { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string }
+
+//admins aren't the sender or recipient, so transfers must be split into a debit row (sender's account) and a credit row (recipient's account) to show up under both
+const adminTransactionsFromApi = (transaction: ApiTransaction): Transaction[] => {
+  const date = new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+  const category = transaction.category || transaction.type
+  const debit: Transaction = { id: String(transaction.id), merchant: transaction.description || transaction.type, date, amount: transaction.type === 'deposit' ? Number(transaction.amount) : -Number(transaction.amount), category, accountNumber: String(transaction.from_owner_account_number) }
+  if (transaction.type !== 'transfer' || !transaction.to_owner_account_number) return [debit]
+  const credit: Transaction = { id: `${transaction.id}-credit`, merchant: 'Transfer received', date, amount: Number(transaction.amount), category, accountNumber: String(transaction.to_owner_account_number) }
+  return [debit, credit]
+}
+
 export async function fetchUser(userId: string): Promise<User> {
   const response = await api.get(`/users/${userId}`)
   return { firstName: response.data.first_name, lastName: response.data.last_name, email: response.data.email, phoneNumber: response.data.phone_number, birthday: response.data.birthday }
@@ -61,9 +73,10 @@ export async function fetchAccount(accountNumber: string): Promise<Account> {
   return accountFromApi(response.data)
 }
 
-export async function fetchTransactions(userId: string): Promise<Transaction[]> {
+export async function fetchTransactions(userId: string, admin = false): Promise<Transaction[]> {
   const response = await api.get('/transactions', { params: { owner_id: userId } })
-  return response.data.map((transaction: Parameters<typeof transactionFromApi>[0]) => transactionFromApi(transaction, userId))
+  if (admin) return (response.data as ApiTransaction[]).flatMap(adminTransactionsFromApi)
+  return response.data.map((transaction: ApiTransaction) => transactionFromApi(transaction, userId))
 }
 
 export async function createAccount(userId: string, accountType: AccountType, amount = '0') {
