@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeftRight, Home, Landmark, LogOut, Menu, UserCircle, X } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { currentUser } from '../../data/mockData'
+import { logout } from '../../api/bankingApi'
 
 export function CustomerLayout() {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const initials = `${currentUser.firstName[0]}${currentUser.lastName[0]}`
+  const signOut = () => { logout(); navigate('/') }
   useEffect(() => {
     const preventFormSubmit = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
@@ -21,7 +24,7 @@ export function CustomerLayout() {
     <header className="topbar">
       <button className="icon-button" type="button" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={22} /></button>
       <div className="brand"><Landmark size={22} /><span>Northstar Bank</span></div>
-      <div className="topbar-actions"><button className="signout-button" type="button"><LogOut size={17} /> Sign out</button></div>
+      <div className="topbar-actions"><button className="signout-button" type="button" onClick={signOut}><LogOut size={17} /> Sign out</button></div>
     </header>
     {menuOpen && <button className="drawer-backdrop" aria-label="Close navigation" type="button" onClick={() => setMenuOpen(false)} />}
     <aside className={`drawer ${menuOpen ? 'drawer-open' : ''}`}>
