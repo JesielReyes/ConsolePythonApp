@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction
+from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction, defaultCategories
 from repository.accountsRepo import get_account_by_number, get_user_account_by_number
 from repository.transactionRepo import get_transactions, save_transaction
 
@@ -64,9 +64,23 @@ def transfer(session: Session, request: TransferTransaction, owner_id):
         raise
 
 
-def fetchTransactionCategories(session: Session, owner_id: int):
+def fetchTransactionCategories(session: Session, owner_id: UUID):
     # TODO: support custom categories in the future
     return list(defaultCategories)
 
-def fetch_transactions(session: Session, owner_id, is_admin=False):
+
+def fetch_transactions(session: Session, owner_id: UUID, is_admin=False):
     return get_transactions(session, owner_id, is_admin)
+
+
+def update_transaction_category(session: Session, transaction_id: int, category: str | None, owner_id: UUID):
+    transaction = session.get(Transaction, transaction_id)
+    if transaction is None:
+        raise ValueError("Transaction not found")
+    if transaction.from_owner_id != owner_id and transaction.to_owner_id != owner_id:
+        raise ValueError("You do not have permission to update this transaction")
+    transaction.category = category
+    session.add(transaction)
+    session.commit()
+    session.refresh(transaction)
+    return transaction
