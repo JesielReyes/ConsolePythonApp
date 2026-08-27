@@ -6,9 +6,9 @@ import { login } from '../../api/bankingApi'
 
 export function LandingPage() {
   const navigate = useNavigate()
-  const location = useLocation()
-  const accountCreated = Boolean((location.state as { accountCreated?: boolean } | null)?.accountCreated)
-  const [email, setEmail] = useState('')
+  const location = useLocation() //useLocation is for accessing the current location object which contains information about the URL and state passed during navigation
+  const accountCreated = Boolean((location.state as { accountCreated?: boolean } | null)?.accountCreated) //checks if customer or admin successfuly created a user account
+  const [email, setEmail] = useState('') //use states to store the inputted values
   const [password, setPassword] = useState('')
   const [adminLogin, setAdminLogin] = useState(false)
   const [error, setError] = useState('')
