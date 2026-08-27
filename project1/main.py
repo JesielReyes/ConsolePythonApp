@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from database import create_db_and_tables
 from routers import accounts, transactions, users
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -16,6 +17,13 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Banking API",
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

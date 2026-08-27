@@ -40,11 +40,11 @@ def purchase(transaction: WithdrawalTransaction, session: SessionDep, owner_id: 
 
 
 @router.post("/transfer")
-def transfer(transaction: TransferTransaction, session: SessionDep, owner_id: UUID):
+def transfer(transaction: TransferTransaction, session: SessionDep):
     try:
-        if get_db_user(session, owner_id).is_admin:
+        if get_db_user(session, transaction.owner_id).is_admin:
             raise HTTPException(status_code=403, detail="Admins cannot make transactions")
-        transaction_service.transfer(session, transaction, owner_id)
+        transaction_service.transfer(session, transaction, transaction.owner_id)
         return {"message": "Transfer success"}
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))

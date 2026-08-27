@@ -36,6 +36,7 @@ class WithdrawalTransaction(BaseModel):
     description: str | None = None
     category: str | None = None
 class TransferTransaction(BaseModel):
+    owner_id: UUID
     from_account_number: int
     to_account_number: int
     to_owner_id: UUID
