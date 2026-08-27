@@ -46,7 +46,7 @@ def transfer(session: Session, request: TransferTransaction, owner_id):
     try:
         source = get_user_account_by_number(session, owner_id, request.from_account_number)
         target = get_account_by_number(session, request.to_account_number)
-        if source is None or target is None or target.owner_id != str(request.to_owner_id):
+        if source is None or target is None:
             raise ValueError("Account does not exist or is not owned by the specified user")
         amount = float(request.amount)
         if amount > source.balance:
@@ -56,7 +56,7 @@ def transfer(session: Session, request: TransferTransaction, owner_id):
         save_transaction(session, Transaction(
             type=TransactionType.TRANSFER, from_owner_id=owner_id,
             from_owner_account_number=request.from_account_number,
-            to_owner_id=request.to_owner_id, to_owner_account_number=request.to_account_number,
+            to_owner_id=target.owner_id, to_owner_account_number=request.to_account_number,
             description=None, category=None, amount=request.amount,
         ))
         session.commit()

@@ -25,7 +25,7 @@ export function TransferPage() {
     if (!amount || Number(amount) <= 0) { setMessage('Enter a valid transfer amount.'); return }
     if (!recipient) { setMessage('Enter a recipient account number.'); return }
     if (!sessionUserId) { setMessage(`${formatMoney(Number(amount))} transfer is ready for API connection.`); setAmount(''); return }
-    try { await transfer(sessionUserId, fromAccount, recipient, sessionUserId, amount); setMessage(`${formatMoney(Number(amount))} transfer submitted.`); setAmount('') }
+    try { await transfer(sessionUserId, fromAccount, recipient, amount); setMessage(`${formatMoney(Number(amount))} transfer submitted.`); setAmount('') }
     catch { setMessage('The transfer could not be completed.') }
   }
 
