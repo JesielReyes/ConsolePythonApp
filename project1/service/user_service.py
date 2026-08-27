@@ -52,6 +52,10 @@ def create_user(
     email: str, password: str, is_admin: bool, birthday, phone_number: str,
     first_name: str, last_name: str
 ):
+    existing_user = session.exec(select(UserDB).where(UserDB.email == email)).first()
+    if existing_user is not None:
+        raise ValueError("Email is already in use")
+
     db_user = UserDB(
         email=email, password_hash=sha256(password.encode()).hexdigest(), is_admin=is_admin,
         birthday=birthday, phone_number=phone_number, first_name=first_name, last_name=last_name
