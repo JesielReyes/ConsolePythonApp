@@ -3,7 +3,7 @@ from uuid import UUID
 
 from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction, defaultCategories, WagerResult
 from repository.accountsRepo import get_account_by_number, get_user_account_by_number
-from repository.transactionRepo import get_transactions, save_transaction
+from repository.transactionRepo import get_transactions, save_transaction, get_withdrawals
 
 
 def deposit(session: Session, request: DepositTransaction, owner_id):
@@ -72,6 +72,9 @@ def fetchTransactionCategories(session: Session, owner_id: UUID):
 
 def fetch_transactions(session: Session, owner_id: UUID, is_admin=False):
     return get_transactions(session, owner_id, is_admin)
+
+def fetch_withdrawals(session: Session, owner_id: UUID):
+    return get_withdrawals(session, owner_id)
 
 
 def update_transaction_category(session: Session, transaction_id: int, category: str | None, owner_id: UUID):

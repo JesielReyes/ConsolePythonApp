@@ -79,6 +79,11 @@ export async function fetchTransactions(userId: string, admin = false): Promise<
   return response.data.map((transaction: ApiTransaction) => transactionFromApi(transaction, userId))
 }
 
+export async function fetchSpending(userId: string): Promise<Transaction[]> {
+  const response = await api.get('/transactions/spending', { params: { owner_id: userId } })
+  return response.data.map(transactionFromApi)
+}
+
 export async function createAccount(userId: string, accountType: AccountType, amount = '0') {
   const response = await api.post('/accounts', { owner_id: userId, account_type: accountType, amount }, { params: { requester_id: userId } })
   return accountFromApi(response.data)
