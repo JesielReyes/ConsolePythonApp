@@ -1,8 +1,9 @@
 from models.transaction import FetchTransactions, defaultCategories
 
 from sqlmodel import Session
+from uuid import UUID
 
-from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction, defaultCategories
+from models.transaction import DepositTransaction, Transaction, TransactionType, TransferTransaction, WithdrawalTransaction, defaultCategories, WagerResult
 from repository.accountsRepo import get_account_by_number, get_user_account_by_number
 from repository.transactionRepo import get_transactions, save_transaction
 
