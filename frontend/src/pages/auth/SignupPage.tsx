@@ -59,7 +59,7 @@ export function SignupPage() {
     event.preventDefault(); setMessage('')
     if (!validate()) return
     setSubmitting(true)
-    try { if (!(await isEmailAvailable(values.email))) { setErrors({ email: 'This email is already registered.' }); return } const user = await createUser({ email: values.email, password: values.password, isAdmin: values.is_admin, birthday: values.birthday, phoneNumber: values.phone_number, firstName: values.first_name, lastName: values.last_name }); localStorage.setItem('banking_user_id', user.id); localStorage.setItem('banking_is_admin', String(user.is_admin)); navigate(user.is_admin ? '/admin/accounts' : '/dashboard') }
+    try { if (!(await isEmailAvailable(values.email))) { setErrors({ email: 'This email is already registered.' }); return } await createUser({ email: values.email, password: values.password, isAdmin: values.is_admin, birthday: values.birthday, phoneNumber: values.phone_number, firstName: values.first_name, lastName: values.last_name }); navigate('/', { state: { accountCreated: true } }) }
     catch (error) { setMessage(error instanceof Error ? error.message : 'We could not create your account. Check your information and try again.') }
     finally { setSubmitting(false) }
   }

@@ -17,16 +17,14 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-
 export const getSessionUserId = () =>
   localStorage.getItem('banking_user_id')
-
 
 export async function login(
   email: string,
   password: string
-) {
-  const response = await api.post('/login', {
+): Promise<{ userId: string; isAdmin: boolean }> {
+  const response = await api.post('/users/login', {
     email,
     password
   })
@@ -41,6 +39,11 @@ export async function login(
     response.data.user_id
   )
 
+  localStorage.setItem(
+    'banking_is_admin',
+    String(response.data.is_admin)
+  )
+
   return {
     userId: response.data.user_id,
     isAdmin: response.data.is_admin
@@ -50,6 +53,7 @@ export async function login(
 export function logout() {
   localStorage.removeItem('banking_access_token')
   localStorage.removeItem('banking_user_id')
+  localStorage.removeItem('banking_is_admin')
 }
 
 export async function createUser(user: { email: string; password: string; isAdmin: boolean; birthday: string; phoneNumber: string; firstName: string; lastName: string }) {
@@ -57,13 +61,20 @@ export async function createUser(user: { email: string; password: string; isAdmi
   return response.data as { id: string; is_admin: boolean }
 }
 
+//goes through 
 export async function isEmailAvailable(email: string) {
   const response = await api.get('/users')
   return !(response.data.users as { email: string }[]).some((user) => user.email.toLowerCase() === email.trim().toLowerCase())
 }
 
-const accountFromApi = (account: { account_number: number; account_type: AccountType; balance: number; created_date: string; is_active: boolean }): Account => ({
-  accountNumber: String(account.account_number), accountType: account.account_type, balance: Number(account.balance), createdDate: account.created_date, isActive: account.is_active,
+export async function fetchUsers(): Promise<{ id: string; firstName: string; lastName: string }[]> {
+  const response = await api.get('/users')
+  return (response.data.users as { id: string; first_name: string; last_name: string }[]).map((user) => ({ id: String(user.id), firstName: user.first_name, lastName: user.last_name }))
+}
+
+//this function is used to convert our account objects from the API format to the frontend format
+const accountFromApi = (account: { account_number: number; account_type: AccountType; balance: number; created_date: string; is_active: boolean; owner_id?: string }): Account => ({
+  accountNumber: String(account.account_number), accountType: account.account_type, balance: Number(account.balance), createdDate: account.created_date, isActive: account.is_active, ownerId: account.owner_id ? String(account.owner_id) : undefined,
 })
 
 const transactionFromApi = (transaction: { id: number; from_owner_account_number: number; description?: string; amount: number; transaction_date: string; category?: string; type: string }): Transaction => ({
