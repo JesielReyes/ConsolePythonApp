@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from datetime import date
 from pydantic import BaseModel
+from uuid import UUID
 
 from database import SessionDep
 from service import user_service
@@ -54,7 +55,7 @@ def list_users(
 
 @router.get("/{user_id}")
 def read_user(
-    user_id: int,
+    user_id: UUID,
     session: SessionDep
 ):
     try:
