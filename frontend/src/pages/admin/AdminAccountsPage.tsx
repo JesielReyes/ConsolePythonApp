@@ -9,12 +9,12 @@ import { fetchAccounts, fetchTransactions, fetchUsers, getSessionUserId, logout,
 import type { Transaction } from '../../types/banking'
 
 export function AdminAccountsPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate() //useNaviagte is for programmatic navigation within the app meaning you can redirect users without them clicking a link
   const sessionUserId = getSessionUserId()
-  const [accounts, setAccounts] = useState(sessionUserId ? [] : initialAccounts)
-  const [transactions, setTransactions] = useState<Transaction[]>(sessionUserId ? [] : initialTransactions)
-  const [ownerNames, setOwnerNames] = useState<Record<string, string>>({})
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
+  const [accounts, setAccounts] = useState(sessionUserId ? [] : initialAccounts) //gets accounts of all users since admins have access to all accounts
+  const [transactions, setTransactions] = useState<Transaction[]>(sessionUserId ? [] : initialTransactions) //can see the transactions of all users since admins have access to all transactions
+  const [ownerNames, setOwnerNames] = useState<Record<string, string>>({}) //populates account boxes with owner names
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null) //stores the account currently selected for viewing details in the modal
   const [error, setError] = useState('')
   useEffect(() => { if (!sessionUserId) return; fetchAccounts(sessionUserId, true).then(setAccounts).catch(() => setError('Live admin data could not be loaded.')) }, [sessionUserId])
   useEffect(() => { if (!sessionUserId) return; fetchTransactions(sessionUserId, true).then(setTransactions).catch(() => setError('Live transaction history could not be loaded.')) }, [sessionUserId])
