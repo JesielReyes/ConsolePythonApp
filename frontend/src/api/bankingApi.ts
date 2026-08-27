@@ -116,8 +116,8 @@ export async function withdraw(userId: string, accountNumber: string, amount: st
   return accountFromApi(response.data)
 }
 
-export async function transfer(userId: string, fromAccountNumber: string, toAccountNumber: string, toOwnerId: string, amount: string) {
-  return api.post('/transactions/transfer', { from_account_number: Number(fromAccountNumber), to_account_number: Number(toAccountNumber), to_owner_id: toOwnerId, amount }, { params: { owner_id: userId } })
+export async function transfer(userId: string, fromAccountNumber: string, toAccountNumber: string, amount: string) {
+  return api.post('/transactions/transfer', { from_account_number: Number(fromAccountNumber), to_account_number: Number(toAccountNumber), amount }, { params: { owner_id: userId } })
 }
 
 export async function updateAccountStatus(requesterId: string, accountNumber: string, isActive: boolean) {
