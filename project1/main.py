@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from database import create_db_and_tables
-from routers import accounts, users, transactions
+from routers import accounts, users, transactions, login
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -55,6 +55,12 @@ app.include_router(
     transactions.router,
     prefix="/transactions",
     tags=["transactions"]
+)
+
+app.include_router(
+    login.router,
+    prefix="/users/login",
+    tags=["login"]
 )
 
 app.add_middleware(

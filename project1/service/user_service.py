@@ -1,4 +1,3 @@
-from hashlib import sha256
 from uuid import UUID
 
 from sqlmodel import Session, select
@@ -6,6 +5,8 @@ from sqlmodel import Session, select
 from dto.user_db import UserDB
 from models.admin import Admin
 from models.customer import Customer
+from security.password import hash_password, verify_password
+from security.jwt import create_access_token
 
 
 def db_user_to_domain(db_user):
@@ -52,8 +53,9 @@ def create_user(
     email: str, password: str, is_admin: bool, birthday, phone_number: str,
     first_name: str, last_name: str
 ):
+    password_hash = hash_password(password)
     db_user = UserDB(
-        email=email, password_hash=sha256(password.encode()).hexdigest(), is_admin=is_admin,
+        email=email, password_hash=password_hash, is_admin=is_admin,
         birthday=birthday, phone_number=phone_number, first_name=first_name, last_name=last_name
     )
 
@@ -66,7 +68,7 @@ def create_user(
 
 def delete_user(
     session: Session,
-    user_id: int
+    user_id: UUID
 ):
     db_user = session.get(
         UserDB,
@@ -81,12 +83,30 @@ def delete_user(
 
     return True
 
+def authenticate(
+    session: Session,
+    email: str,
+    password: str
+):
+    user = session.exec(
+        select(UserDB).where(UserDB.email == email)
+    ).first()
 
-def authenticate(session: Session, email: str, password: str):
-    user = session.exec(select(UserDB).where(UserDB.email == email)).first()
-    if user is None or user.password_hash != sha256(password.encode()).hexdigest():
+    if user is None:
         raise ValueError("Invalid email or password")
-    return user
+
+    if not verify_password(
+        password,
+        user.password_hash
+    ):
+        raise ValueError("Invalid email or password")
+
+    token = create_access_token(
+        user_id=str(user.id),
+        is_admin=user.is_admin
+    )
+
+    return token
 
 
 def get_db_user(session: Session, user_id: UUID):
