@@ -8,7 +8,8 @@ from sqlalchemy import text
 from models.account_model import AccountRecord #imports the account table model we made so SQLModel knows the layout when creating our database tables
 
 #assigns our database url to DATABASE_URL using os to grab it from the environmant variables in the terminal, raises an error if not set
-DATABASE_URL = os.getenv("DATABASE_URL")
+# DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = "postgresql+psycopg2://root:root@localhost:5432/bank"
 
 if not DATABASE_URL:
     raise RuntimeError(
