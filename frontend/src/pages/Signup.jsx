@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createUser } from "../services/userService";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,10 +30,10 @@ function Signup() {
 
     try {
       const user = await createUser(formData);
+      navigate("/login");
 
-      setMessage(`User created successfully. ID: ${user.id}`);
     } catch (error) {
-      setMessage(error.message);
+        console.error(error);
     }
   }
 
