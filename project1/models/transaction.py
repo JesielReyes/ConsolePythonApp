@@ -9,7 +9,7 @@ from sqlmodel import Field, SQLModel
 class TransactionType(str, Enum):
     DEPOSIT = "deposit"
     WITHDRAWAL = "withdrawal"
-    PURCHASE = "purchase"
+    PURCHASE = "purchase" 
     TRANSFER = "transfer"
 
 class WagerResult(str, Enum):
@@ -45,12 +45,9 @@ class WithdrawalTransaction(BaseModel):
 class TransferTransaction(BaseModel):
     from_account_number: int
     to_account_number: int
+    to_owner_id: UUID
     amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
     category: None = None
-
-class FetchTransactions(BaseModel):
-    user_id: int
-    account_number: int
 
 class defaultCategories(str, Enum):
     FOOD = "food"
