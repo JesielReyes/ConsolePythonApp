@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from database import create_db_and_tables
-from routers import accounts, transactions, users
+from routers import accounts, login, transactions, users
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ async def validation_exception_handler(
     )
 
 app.include_router(accounts.router, prefix="/accounts", tags=["accounts"])
+app.include_router(login.router, tags=["login"])
 app.include_router(
     users.router,
     prefix="/users",

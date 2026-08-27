@@ -89,6 +89,12 @@ def authenticate(session: Session, email: str, password: str):
     return user
 
 
+def authenticate_user(session: Session, email: str, password: str):
+    db_user = authenticate(session, email, password)
+
+    return db_user_to_domain(db_user)
+
+
 def get_db_user(session: Session, user_id: UUID):
     user = session.get(UserDB, user_id)
     if user is None:
