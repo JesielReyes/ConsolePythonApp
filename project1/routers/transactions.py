@@ -6,10 +6,7 @@ from models.transaction import DepositTransaction, TransactionType, TransferTran
 from service import transaction_service
 from service.user_service import get_db_user
 
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/main
 router = APIRouter()
 
 

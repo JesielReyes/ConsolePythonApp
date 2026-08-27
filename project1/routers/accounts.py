@@ -5,10 +5,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from database import SessionDep
 from service import account_service
-<<<<<<< HEAD
-=======
 from service.user_service import get_db_user
->>>>>>> origin/main
 
 router = APIRouter()
 
