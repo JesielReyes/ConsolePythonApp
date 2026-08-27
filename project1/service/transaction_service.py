@@ -84,3 +84,30 @@ def update_transaction_category(session: Session, transaction_id: int, category:
     session.commit()
     session.refresh(transaction)
     return transaction
+
+def create_wager(session: Session, transaction_id: int, owner_id: UUID):
+    transaction = session.get(Transaction, transaction_id)
+    if transaction is None or (transaction.from_owner_id != owner_id and transaction.to_owner_id != owner_id):
+        raise ValueError("Transaction not found")
+    if transaction.type != TransactionType.PURCHASE:
+        raise ValueError("Wagers can only be created for purchase transactions")
+    if transaction.wager_result is not None:
+        raise ValueError("Wager has already been created for this transaction")
+
+    # TODO: add usage limits
+    random = __import__('random').random()
+    wager_result = WagerResult.WIN if random > 0.5 else WagerResult.LOSS
+    transaction.wager_result = wager_result
+    # Update the account balance based on the wager result
+    account = get_user_account_by_number(session, owner_id, transaction.from_owner_account_number)
+    if wager_result == WagerResult.WIN:
+        account.balance += transaction.amount
+    else:
+        account.balance -= transaction.amount
+
+    session.add(transaction)
+    session.add(account)
+    session.commit()
+
+    # return wager result and updated account balance
+    return {"message": "Wager created successfully", "wager_result": wager_result, "updated_balance": account.balance}
