@@ -81,19 +81,21 @@ def create_user(
     user_request: UserCreate,
     session: SessionDep
 ):
-    user = user_service.create_user(
-        session,
-        email=user_request.email, password=user_request.password, is_admin=user_request.is_admin,
-        birthday=user_request.birthday, phone_number=user_request.phone_number,
-        first_name=user_request.first_name, last_name=user_request.last_name
-    )
-
-    return user_to_dict(user)
+    try:
+        user = user_service.create_user(
+            session,
+            email=user_request.email, password=user_request.password, is_admin=user_request.is_admin,
+            birthday=user_request.birthday, phone_number=user_request.phone_number,
+            first_name=user_request.first_name, last_name=user_request.last_name
+        )
+        return user_to_dict(user)
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error))
 
 
 @router.delete("/{user_id}")
 def delete_user(
-    user_id: int,
+    user_id: UUID,
     session: SessionDep
 ):
     try:
