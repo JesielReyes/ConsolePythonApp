@@ -54,9 +54,6 @@ export function DashboardPage() {
   ) })
       .catch(() => setError('We could not load your live account data. Please try again.'))
   }, [sessionUserId])
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
-  const [openAccountType, setOpenAccountType] = useState<'Checking' | 'Savings' | null>(null)
-  const [openingDeposit, setOpeningDeposit] = useState('0')
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
