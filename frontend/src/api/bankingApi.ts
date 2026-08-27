@@ -24,7 +24,7 @@ export async function login(
   email: string,
   password: string
 ): Promise<{ userId: string; isAdmin: boolean }> {
-  const response = await api.post('/users/login', {
+  const response = await api.post('/login', {
     email,
     password
   })
