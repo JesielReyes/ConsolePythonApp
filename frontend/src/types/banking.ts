@@ -16,6 +16,8 @@ export type Transaction = {
   amount: number
   category: string
   accountNumber: string
+  type?: string
+  wagerResult?: 'win' | 'loss' | null
 }
 
 export type User = {
