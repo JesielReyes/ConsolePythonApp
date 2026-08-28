@@ -12,7 +12,7 @@ import {
   initialTransactions,
 } from '../../data/mockData'
 
-import type { Account } from '../../types/banking'
+import type { Account, Transaction } from '../../types/banking'
 import { createAccount, fetchAccounts, fetchTransactions, fetchUser, getSessionUserId, fetchSpending } from '../../api/bankingApi'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
@@ -42,7 +42,7 @@ export function DashboardPage() {
     useState('0')
 
 
-  const [spending, setSpending] = useState([])
+  const [spending, setSpending] = useState<Transaction[]>([])
   useEffect(() => {
     if (!sessionUserId) return
     Promise.all([fetchAccounts(sessionUserId), fetchTransactions(sessionUserId), fetchUser(sessionUserId), fetchSpending(sessionUserId)])
