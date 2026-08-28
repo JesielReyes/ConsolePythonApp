@@ -4,7 +4,6 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import os
 from database import create_db_and_tables
 from routers import accounts, users, transactions, login
 
@@ -20,17 +19,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-frontend_url = os.getenv(
-    "https://d3ez92l785hy8r.cloudfront.net",
-    "http://127.0.0.1:5173",
-    "http://localhost:5173",
-)
-
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        frontend_url
+        "https://d3ez92l785hy8r.cloudfront.net",
+        "http://127.0.0.1:5173",
+        "http://localhost:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
