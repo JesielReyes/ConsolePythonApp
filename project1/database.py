@@ -8,13 +8,12 @@ from sqlalchemy import text
 from models.account_model import AccountRecord #imports the account table model we made so SQLModel knows the layout when creating our database tables
 
 #assigns our database url to DATABASE_URL using os to grab it from the environmant variables in the terminal, raises an error if not set
-# DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# if not DATABASE_URL:
-#     raise RuntimeError(
-#         "DATABASE_URL must be set before starting the application"
-#     )
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///banking.db")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL must be set before starting the application"
+    )
 #an engine is just a connection manager. It will know what database to connect to, which driver to use, how to open the connections for the databse, and how to manage and reuse those connections.
 engine = create_engine(
     DATABASE_URL,
@@ -28,6 +27,10 @@ def create_db_and_tables():
         with engine.begin() as connection:
             connection.execute(text(
                 "ALTER TABLE transaction ALTER COLUMN category DROP NOT NULL"
+            ))
+            #create_all only adds new tables, not new columns on existing ones, so patch wager_result in manually
+            connection.execute(text(
+                "ALTER TABLE transaction ADD COLUMN IF NOT EXISTS wager_result VARCHAR"
             ))
 
 #a session is a temp connection to the database, used to query records, add records, update, etc
