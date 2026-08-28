@@ -11,7 +11,7 @@ export function AccountDetailsModal({ account, transactions, onClose, onWithdraw
     <div className="modal-header"><div><p className="eyebrow">{account.accountType.toUpperCase()} ACCOUNT</p><h2 id="account-modal-title">{account.accountNumber}</h2>{admin && <p className="modal-owner">{ownerName ?? 'Unknown owner'}</p>}</div><button className="icon-button" type="button" aria-label="Close account details" onClick={onClose}><X size={21} /></button></div>
     <div className="modal-balance"><span>Available balance</span><strong>{formatMoney(account.balance)}</strong></div>
     <div className="modal-meta"><span><CalendarDays size={16} /> Opened {account.createdDate}</span><span className={account.isActive ? 'status-active' : 'status-inactive'}>{account.isActive ? 'Currently active' : 'Currently closed'}</span></div>
-    <div className="modal-section-heading"><h3>Recent transactions</h3><span>{accountTransactions.length} shown</span></div><TransactionList transactions={accountTransactions} onBalanceUpdated={onBalanceUpdated} wagersEnabled={!admin} />
+    <div className="modal-section-heading"><h3>Recent transactions</h3><span>{accountTransactions.length} shown</span></div><TransactionList transactions={accountTransactions} onBalanceUpdated={onBalanceUpdated} wagersEnabled={!admin} categoriesEnabled={!admin} />
     {account.isActive && !admin && onWithdraw && <button className="full-width-button" type="button" onClick={() => onWithdraw(account)}>Withdraw from this account <ChevronRight size={17} /></button>}
   </section></div>
 }
