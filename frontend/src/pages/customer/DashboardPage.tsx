@@ -16,6 +16,15 @@ import type { Account } from '../../types/banking'
 import { createAccount, fetchAccounts, fetchTransactions, fetchUser, getSessionUserId, fetchSpending } from '../../api/bankingApi'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
+interface SpendingTransaction {
+  id: string;
+  merchant: string;
+  date: string;
+  category: string;
+  accountNumber: string;
+  amount: number;
+}
+
 export function DashboardPage() {
   const navigate = useNavigate()
   const sessionUserId = getSessionUserId()
@@ -42,7 +51,7 @@ export function DashboardPage() {
     useState('0')
 
 
-  const [spending, setSpending] = useState([])
+  const [spending, setSpending] = useState<SpendingTransaction[]>([])
   useEffect(() => {
     if (!sessionUserId) return
     Promise.all([fetchAccounts(sessionUserId), fetchTransactions(sessionUserId), fetchUser(sessionUserId), fetchSpending(sessionUserId)])
