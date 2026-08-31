@@ -5,7 +5,7 @@ import { formatMoney } from '../../data/mockData'
 import { createWager, fetchTransactionCategories, getSessionUserId, updateTransactionCategory } from '../../api/bankingApi'
 import CoinFlip from '../coinflip/CoinFlip'
 
-export function TransactionList({ transactions, onBalanceUpdated, wagersEnabled = true, categoriesEnabled = true }: { transactions: Transaction[]; onBalanceUpdated?: (accountNumber: string, balance: number) => void; wagersEnabled?: boolean; categoriesEnabled?: boolean }) {
+export function TransactionList({ transactions, onBalanceUpdated, onWagerCreated, wagersEnabled = true, categoriesEnabled = true }: { transactions: Transaction[]; onBalanceUpdated?: (accountNumber: string, balance: number) => void; onWagerCreated?: (transactionId: string, result: 'win' | 'loss') => void; wagersEnabled?: boolean; categoriesEnabled?: boolean }) {
   const ownerId = getSessionUserId()
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<Record<string, string>>({})
@@ -34,6 +34,7 @@ export function TransactionList({ transactions, onBalanceUpdated, wagersEnabled 
       {wagersEnabled && ownerId && transaction.amount < 0 && transaction.type === 'purchase' && <CoinFlip amount={Math.abs(transaction.amount)} currency="USD" initialResult={transaction.wagerResult === 'win' ? true : transaction.wagerResult === 'loss' ? false : null} onComplete={async () => {
         const wager = await createWager(transaction.id, ownerId)
         onBalanceUpdated?.(transaction.accountNumber, wager.updatedBalance)
+        onWagerCreated?.(transaction.id, wager.wagerResult)
         return wager.wagerResult === 'win'
       }} />}
     </div>
