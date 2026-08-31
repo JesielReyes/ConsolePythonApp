@@ -2,13 +2,18 @@ import { useEffect, useState } from 'react'
 import { ArrowLeftRight, Home, Landmark, LogOut, Menu, UserCircle, X } from 'lucide-react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { currentUser } from '../../data/mockData'
-import { logout } from '../../api/bankingApi'
+import { fetchUser, getSessionUserId, logout } from '../../api/bankingApi'
 
 export function CustomerLayout() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
-  const initials = `${currentUser.firstName[0]}${currentUser.lastName[0]}`
+  const [user, setUser] = useState(currentUser)
+  const initials = `${user.firstName[0]}${user.lastName[0]}`
   const signOut = () => { logout(); navigate('/') }
+  useEffect(() => {
+    const sessionUserId = getSessionUserId()
+    if (sessionUserId) fetchUser(sessionUserId).then(setUser).catch(() => {})
+  }, [])
   useEffect(() => {
     const preventFormSubmit = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
@@ -35,7 +40,7 @@ export function CustomerLayout() {
         <NavLink className="nav-link" to="/transfer" onClick={() => setMenuOpen(false)}><ArrowLeftRight size={18} /> Transfers</NavLink>
         <NavLink className="nav-link" to="/profile" onClick={() => setMenuOpen(false)}><UserCircle size={18} /> Profile</NavLink>
       </nav>
-      <div className="drawer-footer"><p>Signed in as</p><strong>{currentUser.firstName} {currentUser.lastName}</strong></div>
+      <div className="drawer-footer"><p>Signed in as</p><strong>{user.firstName} {user.lastName}</strong></div>
     </aside>
     <Outlet context={{ initials }} />
   </div>
