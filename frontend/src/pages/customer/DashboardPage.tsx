@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Plus, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 
 import { AccountCard } from '../../components/accounts/AccountCard'
 import { AccountDetailsModal } from '../../components/accounts/AccountDetailsModal'
@@ -27,6 +27,7 @@ interface SpendingTransaction {
 
 export function DashboardPage() {
   const navigate = useNavigate()
+  const { initials = '' } = useOutletContext<{ initials: string }>()
   const sessionUserId = getSessionUserId()
 
   const [accounts, setAccounts] = useState<Account[]>(
@@ -85,7 +86,7 @@ export function DashboardPage() {
     setAccounts((items) => items.map((account) => account.accountNumber === accountNumber ? { ...account, balance } : account))
     setSelectedAccount((account) => account?.accountNumber === accountNumber ? { ...account, balance } : account)
   }
-  return <main className="page-content"><section className="welcome-row"><div><p className="eyebrow">PERSONAL BANKING</p><h1>{greeting}, {displayName.split(' ')[0]}</h1><p className="subtitle">Here is your financial snapshot.</p></div><div className="profile-chip"><span>JS</span><div><strong>{displayName}</strong><small>Customer</small></div></div></section>
+  return <main className="page-content"><section className="welcome-row"><div><p className="eyebrow">PERSONAL BANKING</p><h1>{greeting}, {displayName.split(' ')[0]}</h1><p className="subtitle">Here is your financial snapshot.</p></div><div className="profile-chip"><span>{initials}</span><div><strong>{displayName}</strong><small>Customer</small></div></div></section>
     {error && <p className="error-message">{error}</p>}
     <section className="account-section"><div className="section-heading"><div><p className="eyebrow">YOUR ACCOUNTS</p><h2>Accounts</h2></div><span className="account-count">{accounts.length} accounts</span></div><div className="account-grid">
       {accounts.map((account) => <AccountCard key={account.accountNumber} account={account} onSelect={setSelectedAccount} />)}
