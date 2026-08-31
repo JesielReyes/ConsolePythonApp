@@ -77,25 +77,25 @@ const accountFromApi = (account: { account_number: number; account_type: Account
   accountNumber: String(account.account_number), accountType: account.account_type, balance: Number(account.balance), createdDate: account.created_date, isActive: account.is_active, ownerId: account.owner_id ? String(account.owner_id) : undefined,
 })
 
-const transactionFromApi = (transaction: { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string }, viewerId: string): Transaction => {
+const transactionFromApi = (transaction: { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string; wager_result?: 'win' | 'loss' | null }, viewerId: string): Transaction => {
   //transfers are only a credit for the recipient; everyone else sees them as money leaving their account
   const isRecipient = transaction.type === 'transfer' && String(transaction.to_owner_id) === viewerId
   const accountNumber = isRecipient && transaction.to_owner_account_number ? transaction.to_owner_account_number : transaction.from_owner_account_number
   const amount = transaction.type === 'deposit' || isRecipient ? Number(transaction.amount) : -Number(transaction.amount)
   return {
-    id: String(transaction.id), merchant: transaction.description || (isRecipient ? 'Transfer received' : transaction.type), date: new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), amount, category: transaction.category || transaction.type, accountNumber: String(accountNumber),
+    id: String(transaction.id), merchant: transaction.description || (isRecipient ? 'Transfer received' : transaction.type), date: new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), amount, category: transaction.category ?? undefined, accountNumber: String(accountNumber), type: transaction.type, wagerResult: transaction.wager_result,
   }
 }
 
-type ApiTransaction = { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string }
+type ApiTransaction = { id: number; from_owner_id: string; from_owner_account_number: number; to_owner_id?: string | null; to_owner_account_number?: number | null; description?: string; amount: number; transaction_date: string; category?: string; type: string; wager_result?: 'win' | 'loss' | null }
 
 //admins aren't the sender or recipient, so transfers must be split into a debit row (sender's account) and a credit row (recipient's account) to show up under both
 const adminTransactionsFromApi = (transaction: ApiTransaction): Transaction[] => {
   const date = new Date(transaction.transaction_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-  const category = transaction.category || transaction.type
-  const debit: Transaction = { id: String(transaction.id), merchant: transaction.description || transaction.type, date, amount: transaction.type === 'deposit' ? Number(transaction.amount) : -Number(transaction.amount), category, accountNumber: String(transaction.from_owner_account_number) }
+  const category = transaction.category ?? undefined
+  const debit: Transaction = { id: String(transaction.id), merchant: transaction.description || transaction.type, date, amount: transaction.type === 'deposit' ? Number(transaction.amount) : -Number(transaction.amount), category, accountNumber: String(transaction.from_owner_account_number), type: transaction.type, wagerResult: transaction.wager_result }
   if (transaction.type !== 'transfer' || !transaction.to_owner_account_number) return [debit]
-  const credit: Transaction = { id: `${transaction.id}-credit`, merchant: 'Transfer received', date, amount: Number(transaction.amount), category, accountNumber: String(transaction.to_owner_account_number) }
+  const credit: Transaction = { id: `${transaction.id}-credit`, merchant: 'Transfer received', date, amount: Number(transaction.amount), category, accountNumber: String(transaction.to_owner_account_number), type: transaction.type, wagerResult: transaction.wager_result }
   return [debit, credit]
 }
 
@@ -142,6 +142,21 @@ export async function withdraw(userId: string, accountNumber: string, amount: st
 
 export async function transfer(userId: string, fromAccountNumber: string, toAccountNumber: string, amount: string) {
   return api.post('/transactions/transfer', { from_account_number: Number(fromAccountNumber), to_account_number: Number(toAccountNumber), amount }, { params: { owner_id: userId } })
+}
+
+export async function createWager(transactionId: string, ownerId: string): Promise<{ wagerResult: 'win' | 'loss'; updatedBalance: number }> {
+  const response = await api.post(`/transactions/${transactionId}/wager`, null, { params: { owner_id: ownerId } })
+  return { wagerResult: response.data.wager_result, updatedBalance: Number(response.data.updated_balance) }
+}
+
+export async function fetchTransactionCategories(ownerId: string): Promise<string[]> {
+  const response = await api.get(`/transactions/owners/${ownerId}/categories`)
+  return (response.data as string[]).map(String)
+}
+
+export async function updateTransactionCategory(transactionId: string, ownerId: string, category?: string) {
+  const response = await api.put(`/transactions/${transactionId}/category`, null, { params: { owner_id: ownerId, ...(category ? { category } : {}) } })
+  return response.data
 }
 
 export async function updateAccountStatus(requesterId: string, accountNumber: string, isActive: boolean) {
