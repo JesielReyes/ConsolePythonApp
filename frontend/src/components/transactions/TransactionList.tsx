@@ -30,13 +30,27 @@ export function TransactionList({ transactions, onBalanceUpdated, onWagerCreated
     <div className="transaction-icon"><ArrowLeftRight size={17} /></div>
     <div className="transaction-copy"><strong>{transaction.merchant}</strong><span>{selectedCategories[transaction.id] || 'None'} · {transaction.date}</span>{categoriesEnabled && <select className="transaction-category" aria-label={`Category for ${transaction.merchant}`} value={selectedCategories[transaction.id] ?? transaction.category ?? ''} onChange={(event) => changeCategory(transaction, event.target.value)}><option value="">None</option>{categories.map((category) => <option key={category} value={category}>{category}</option>)}</select>}</div>
     <div className="transaction-actions">
-      <strong className={transaction.amount > 0 ? 'credit' : ''}>{formatMoney(transaction.amount)}</strong>
       {wagersEnabled && ownerId && transaction.amount < 0 && transaction.type === 'purchase' && <CoinFlip amount={Math.abs(transaction.amount)} currency="USD" initialResult={transaction.wagerResult === 'win' ? true : transaction.wagerResult === 'loss' ? false : null} onComplete={async () => {
         const wager = await createWager(transaction.id, ownerId)
         onBalanceUpdated?.(transaction.accountNumber, wager.updatedBalance)
         onWagerCreated?.(transaction.id, wager.wagerResult)
         return wager.wagerResult === 'win'
       }} />}
+      {transaction.wagerResult === 'win' && (
+        <strong className="wager-amount-win">
+          <span className="wager-amount-original">{formatMoney(transaction.amount)}</span>
+          <span className="wager-amount-new">FREE</span>
+        </strong>
+      )}
+      {transaction.wagerResult === 'loss' && (
+        <strong className="wager-amount-loss">
+          <span className="wager-amount-original">{formatMoney(transaction.amount)}</span>
+          <span className="wager-amount-new">{formatMoney(transaction.amount * 2)}</span>
+        </strong>
+      )}
+      {transaction.wagerResult !== 'win' && transaction.wagerResult !== 'loss' && (
+        <strong className={transaction.amount > 0 ? 'credit' : ''}>{formatMoney(transaction.amount)}</strong>
+      )}
     </div>
   </div>)}</div>
 }

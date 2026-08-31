@@ -1,4 +1,6 @@
 import { useState } from "react";
+import bombIcon from "../../assets/bomb.svg";
+import moneyBagIcon from "../../assets/money_bag.svg";
 
 export interface CoinFlipProps {
 	/** Amount that is at stake for this transaction. */
@@ -9,7 +11,7 @@ export interface CoinFlipProps {
 	disabled?: boolean;
 }
 
-/** A small, self-contained double-or-nothing control for transaction rows. */
+/** A small, self-contained free-or-double control for transaction rows. */
 export default function CoinFlip({
 	amount,
 	currency = "USD",
@@ -19,6 +21,7 @@ export default function CoinFlip({
 }: CoinFlipProps) {
 	const [flipping, setFlipping] = useState(false);
 	const [result, setResult] = useState<boolean | null>(initialResult);
+	const [didFlip, setDidFlip] = useState(false);
 	const [error, setError] = useState(false);
 	const completed = result !== null;
 
@@ -26,17 +29,16 @@ export default function CoinFlip({
 		if (flipping || disabled || completed) return;
 
 		setFlipping(true);
-		setResult(null);
 		setError(false);
 
 		window.setTimeout(async () => {
-			const won = Math.random() >= 0.5;
 			try {
-				const completedResult = await onComplete?.(won ? amount * 2 : 0, won);
-				setResult(typeof completedResult === "boolean" ? completedResult : won);
+				const completedResult = await onComplete?.(amount, false);
+				if (typeof completedResult === "boolean") setResult(completedResult);
 			} catch {
 				setError(true);
 			} finally {
+				setDidFlip(true);
 				setFlipping(false);
 			}
 		}, 700);
@@ -47,37 +49,52 @@ export default function CoinFlip({
 		currency,
 	}).format(amount);
 
+	const coinClass = [
+		"coin",
+		flipping ? "is-flipping" : "",
+		didFlip ? "did-flip" : "",
+		result === true ? "is-revealed is-free" : "",
+		result === false ? "is-revealed is-double" : "",
+	]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<div className="coin-flip" style={{ textAlign: "center" }}>
+		<div className="coin-flip">
 			<button
 				type="button"
-				aria-label={completed ? "Wager already completed" : `Flip coin to double ${formattedAmount} or receive nothing`}
+				className={coinClass}
+				aria-label={
+					completed
+						? result
+							? "Wager result: free"
+							: "Wager result: double"
+						: `Flip coin to make ${formattedAmount} free or double`
+				}
 				aria-busy={flipping}
 				disabled={disabled || flipping || completed}
 				onClick={flip}
-				style={{
-					width: 52,
-					height: 52,
-					borderRadius: "50%",
-					border: "3px solid #d49a24",
-					background: "linear-gradient(145deg, #ffe58a, #d99b24)",
-					color: "#6b4500",
-					cursor: disabled || flipping || completed ? "default" : "pointer",
-					fontWeight: 700,
-					transform: flipping ? "rotateY(720deg)" : "rotateY(0deg)",
-					transition: "transform 700ms ease-in-out, opacity 150ms ease",
-					opacity: disabled ? 0.5 : 1,
-				}}
 			>
-				{flipping ? "…" : result === null ? "½" : result ? "2×" : "0"}
+				<span className="coin-inner">
+					<span className="coin-face coin-front">?</span>
+					<span className={`coin-face coin-back ${result === true ? "is-free" : result === false ? "is-double" : ""}`}>
+						{result === true ? (
+							<img className="coin-icon" src={moneyBagIcon} alt="" />
+						) : result === false ? (
+							<img className="coin-icon" src={bombIcon} alt="" />
+						) : (
+							"?"
+						)}
+					</span>
+				</span>
 			</button>
-			<div aria-live="polite" style={{ marginTop: 6, fontSize: 12 }}>
-				{result === null && !flipping && !error && `Double or nothing (${formattedAmount})`}
-				{flipping && "Flipping…"}
-				{result === true && `You won ${currency}${(amount * 2).toFixed(2)}!`}
-				{result === false && "No payout this time."}
+			<div className="visually-hidden" aria-live="polite">
 				{error && "Wager could not be completed."}
+				{!error && flipping && "Flipping"}
+				{!error && result === true && "Free"}
+				{!error && result === false && "Doubled"}
 			</div>
+			{error && <div className="coin-status">Could not complete</div>}
 		</div>
 	);
 }

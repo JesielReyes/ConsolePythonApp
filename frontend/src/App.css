@@ -20,3 +20,25 @@
 .field-message { margin: 0 0 4px; color: var(--red); font-size: 11px; font-weight: 800; }.field-error > label { color: var(--red); }.login-panel input.input-error, .signup-panel input.input-error { border-color: var(--red); color: var(--red); box-shadow: 0 0 0 3px rgba(189,75,75,.12); }.signup-panel select { width: 100%; box-sizing: border-box; padding: 13px; border: 1px solid var(--border); border-radius: 6px; color: var(--text-h); background: var(--bg); font: inherit; font-size: 14px; }.checking-text { color: var(--accent) !important; font-weight: 600 !important; }
 .open-account-modal { max-width: 480px; }.account-opening-form { max-width: none; margin-top: 28px; padding: 0; border: 0; }.form-hint { font-size: 12px; }
 input[type='number'] { appearance: textfield; -moz-appearance: textfield; }input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button { margin: 0; -webkit-appearance: none; }
+
+.transaction-category { margin-top: 6px; max-width: 160px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-h); font: inherit; font-size: 11px; }
+.coin-flip { display: grid; justify-items: center; gap: 4px; min-width: 52px; perspective: 240px; }
+.coin { width: 52px; height: 52px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.coin:disabled { cursor: default; }
+.coin-inner { position: relative; display: grid; place-items: center; width: 52px; height: 52px; transform-style: preserve-3d; }
+.coin.is-flipping .coin-inner, .coin.did-flip .coin-inner { transition: transform 700ms ease-in-out; }
+.coin.is-flipping .coin-inner { transform: rotateY(720deg); }
+.coin.is-revealed .coin-inner { transform: rotateY(180deg); }
+.coin.did-flip.is-revealed .coin-inner { transform: rotateY(900deg); }
+.coin-face { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; border: 3px solid #d49a24; background: linear-gradient(145deg, #ffe58a, #d99b24); color: #6b4500; font-size: 22px; font-weight: 800; backface-visibility: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 4px 8px rgba(107,69,0,.18); }
+.coin-back { transform: rotateY(180deg); }
+.coin-back.is-free { border-color: #c9a227; background: linear-gradient(145deg, #fff1a8, #d4b12a); }
+.coin-back.is-double { border-color: #c57d1f; background: linear-gradient(145deg, #ffd27a, #c98422); }
+.coin-icon { width: 40px; height: 40px; display: block; object-fit: contain; }
+.coin-status { color: var(--red); font-size: 10px; font-weight: 700; text-align: center; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.wager-amount-win, .wager-amount-loss { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; line-height: 1.15; text-align: right; }
+.wager-amount-original { text-decoration: line-through; color: var(--text); font-weight: 600; font-size: 12px; }
+.wager-amount-win .wager-amount-original { color: var(--green); }
+.wager-amount-win .wager-amount-new { color: var(--green); font-size: 14px; letter-spacing: .04em; }
+.wager-amount-new { color: var(--red); }
