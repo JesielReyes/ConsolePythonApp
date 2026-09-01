@@ -28,8 +28,11 @@ export function TransactionList({ transactions, onBalanceUpdated, onWagerCreated
 
   return <div className="transaction-list">{transactions.map((transaction) => <div className="transaction-row" key={transaction.id}>
     <div className="transaction-icon"><ArrowLeftRight size={17} /></div>
-    <div className="transaction-copy"><strong>{transaction.merchant}</strong><span>{selectedCategories[transaction.id] || 'None'} · {transaction.date}</span>{categoriesEnabled && <select className="transaction-category" aria-label={`Category for ${transaction.merchant}`} value={selectedCategories[transaction.id] ?? transaction.category ?? ''} onChange={(event) => changeCategory(transaction, event.target.value)}><option value="">None</option>{categories.map((category) => <option key={category} value={category}>{category}</option>)}</select>}</div>
-    <div className="transaction-actions">
+    <div className="transaction-main">
+      <div className="transaction-copy"><strong>{transaction.merchant}</strong><span>{transaction.date}</span></div>
+      {categoriesEnabled && <select className="transaction-category" aria-label={`Category for ${transaction.merchant}`} value={selectedCategories[transaction.id] ?? transaction.category ?? ''} onChange={(event) => changeCategory(transaction, event.target.value)}><option value="">None</option>{categories.map((category) => <option key={category} value={category}>{category}</option>)}</select>}
+    </div>
+    <div className={`transaction-actions${wagersEnabled && ownerId && transaction.amount < 0 && transaction.type === 'purchase' ? ' has-coin' : ''}`}>
       {wagersEnabled && ownerId && transaction.amount < 0 && transaction.type === 'purchase' && <CoinFlip amount={Math.abs(transaction.amount)} currency="USD" initialResult={transaction.wagerResult === 'win' ? true : transaction.wagerResult === 'loss' ? false : null} onComplete={async () => {
         const wager = await createWager(transaction.id, ownerId)
         onBalanceUpdated?.(transaction.accountNumber, wager.updatedBalance)

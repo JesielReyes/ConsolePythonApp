@@ -21,7 +21,11 @@
 .open-account-modal { max-width: 480px; }.account-opening-form { max-width: none; margin-top: 28px; padding: 0; border: 0; }.form-hint { font-size: 12px; }
 input[type='number'] { appearance: textfield; -moz-appearance: textfield; }input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button { margin: 0; -webkit-appearance: none; }
 
-.transaction-category { margin-top: 6px; max-width: 160px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-h); font: inherit; font-size: 11px; }
+.transaction-main { display: grid; grid-template-columns: 1fr; gap: 8px; flex: 1; min-width: 0; align-items: center; }
+.transaction-category { max-width: 160px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-h); font: inherit; font-size: 11px; justify-self: start; }
+@media (min-width: 600px) {
+  .transaction-main { grid-template-columns: auto auto minmax(0, 1fr); gap: 16px; }
+}
 .coin-flip { display: grid; justify-items: center; gap: 4px; min-width: 52px; perspective: 240px; }
 .coin { width: 52px; height: 52px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .coin:disabled { cursor: default; }
@@ -42,3 +46,4 @@ input[type='number'] { appearance: textfield; -moz-appearance: textfield; }input
 .wager-amount-win .wager-amount-original { color: var(--green); }
 .wager-amount-win .wager-amount-new { color: var(--green); font-size: 14px; letter-spacing: .04em; }
 .wager-amount-new { color: var(--red); }
+.transaction-actions.has-coin { min-width: 160px; justify-content: space-between; }
