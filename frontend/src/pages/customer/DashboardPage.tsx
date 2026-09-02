@@ -60,6 +60,7 @@ export function DashboardPage() {
     loadedSpending.map((transaction) => ({
       ...transaction,
       amount: Math.abs(Number(transaction.amount)),
+      category: transaction.category || ''
     }))
   ) })
       .catch(() => setError('We could not load your live account data. Please try again.'))
